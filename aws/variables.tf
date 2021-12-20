@@ -1,3 +1,5 @@
+variable "region" {}
+
 variable "cluster_name" {}
 
 variable "map_roles" {

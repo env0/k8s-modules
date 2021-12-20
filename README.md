@@ -3,6 +3,10 @@
 ### AWS 
 #### Full-blown install
 ```terraform
+provider "aws" {
+  region = var.region
+}
+
 module "my-cluster" {
   source = "git::github.com:env0/k8s-modules.git//aws"
 
