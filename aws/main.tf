@@ -22,6 +22,7 @@ module "efs" {
   depends_on = [module.eks]
   source     = "./efs"
 
+  region       = var.region
   vpc_id       = module.vpc.vpc_id
   cluster_name = var.cluster_name
 }
