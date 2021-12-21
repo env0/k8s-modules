@@ -2,11 +2,11 @@ data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
 
-module "oidc_provider_data" {
-  source  = "reegnz/oidc-provider-data/aws"
-  version = "0.0.3"
+module "oidc-provider-data" {
+  source     = "reegnz/oidc-provider-data/aws"
+  version    = "0.0.3"
 
-  name = "${var.cluster_name}-eks-irsa"
+  issuer_url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
 
 locals {

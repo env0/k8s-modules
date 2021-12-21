@@ -9,7 +9,7 @@ data "aws_eks_node_group" "node_group" {
 
 module "oidc-provider-data" {
   source     = "reegnz/oidc-provider-data/aws"
-  version    = "0.0.2"
+  version    = "0.0.3"
 
   issuer_url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
 }
