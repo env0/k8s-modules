@@ -1,9 +1,17 @@
+data "aws_subnet_ids" "private" {
+  vpc_id = var.vpc_id
+
+  tags = {
+    tier = "private"
+  }
+}
+
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "17.24.0"
   cluster_name    = var.cluster_name
   cluster_version = "1.20"
-  subnets         = var.private_subnets
+  subnets         = data.aws_subnet_ids.private.ids
   enable_irsa     = true
   vpc_id          = var.vpc_id
 
