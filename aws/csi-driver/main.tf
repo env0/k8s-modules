@@ -11,7 +11,7 @@ module "oidc-provider-data" {
 
 locals {
   cluster_oidc_issuer_url = flatten(concat(data.aws_eks_cluster.cluster.identity[*].oidc[0].issuer, [""]))[0]
-  oidc_without_http = replace(cluster_oidc_issuer_url, "https://", "")
+  oidc_without_http = replace(local.cluster_oidc_issuer_url, "https://", "")
 }
 
 resource "aws_iam_role" "role_with_web_identity_oidc" {
@@ -22,7 +22,7 @@ resource "aws_iam_role" "role_with_web_identity_oidc" {
       {
         Effect : "Allow",
         Principal : {
-          "Federated" : "${module.oidc_provider_data.arn}"
+          "Federated" : "${module.oidc-provider-data.arn}"
         },
         Action : "sts:AssumeRoleWithWebIdentity",
         Condition : {

@@ -25,7 +25,7 @@ module "eks-cluster-autoscaler" {
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
-  cluster_identity_oidc_issuer_arn = module.oidc_provider_data.arn
+  cluster_identity_oidc_issuer_arn = module.oidc-provider-data.arn
 
   helm_chart_version = "9.9.2"
 
@@ -49,17 +49,17 @@ module "eks-cluster-autoscaler" {
 module "suspend_asg_processes_command" {
   source           = "digitickets/cli/aws"
   version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "suspend-processes", "--auto-scaling-group-name ${autoscaling_group_name}", "--scaling-processes AZRebalance"]
+  aws_cli_commands = ["autoscaling", "suspend-processes", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--scaling-processes AZRebalance"]
 }
 
 module "set_asg_default_cooldown_command" {
   source           = "digitickets/cli/aws"
   version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "update-auto-scaling-group", "--auto-scaling-group-name ${autoscaling_group_name}", "--default-cooldown 60"]
+  aws_cli_commands = ["autoscaling", "update-auto-scaling-group", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--default-cooldown 60"]
 }
 
 module "enable_asg_metrics_collection" {
   source           = "digitickets/cli/aws"
   version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "enable-metrics-collection ", "--auto-scaling-group-name ${autoscaling_group_name}", "--granularity \"1Minute\""]
+  aws_cli_commands = ["autoscaling", "enable-metrics-collection ", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--granularity \"1Minute\""]
 }

@@ -19,8 +19,6 @@ module "efs" {
   vpc_id  = var.vpc_id
   subnets = data.aws_subnet_ids.private.ids
 
-  depends_on = [data.aws_eks_cluster.cluster.vpc_config.cluster_security_group_id]
-
   transition_to_ia = "AFTER_7_DAYS"
 
   // NOTE: the module is stupid and puts this tag on the security group and access point as well
@@ -35,7 +33,7 @@ module "efs" {
       to_port                  = 2049
       protocol                 = "tcp"
       cidr_blocks              = []
-      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config.cluster_security_group_id
+      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
       description              = "Allow ingress traffic to EFS from primary EKS security group"
     },
     {
@@ -44,7 +42,7 @@ module "efs" {
       to_port                  = 2049
       protocol                 = "tcp"
       cidr_blocks              = []
-      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config.cluster_security_group_id
+      source_security_group_id = data.aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id
       description              = "Allow ingress traffic to EFS from additional EKS security group"
     }
   ]
