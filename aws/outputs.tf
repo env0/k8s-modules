@@ -1,5 +1,5 @@
 output "kubernetes_host" {
-  value       = module.eks.cluster_endpoint
+  value       = module.eks.kubernetes_host
   description = "EKS cluster host endpoint"
 }
 

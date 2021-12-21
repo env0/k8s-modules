@@ -3,6 +3,8 @@ data "aws_eks_cluster" "cluster" {
 }
 
 module "oidc-provider-data" {
+  depends_on = [data.aws_eks_cluster.cluster]
+
   source     = "reegnz/oidc-provider-data/aws"
   version    = "0.0.3"
 
