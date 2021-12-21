@@ -22,7 +22,6 @@ module "efs" {
   vpc_id  = var.vpc_id
   subnets = data.aws_subnet_ids.private.ids
 
-  security_group_name = "${var.cluster_name}-sg-efs"
   transition_to_ia    = "AFTER_7_DAYS"
 
   // NOTE: the module is stupid and puts this tag on the security group and access point as well
