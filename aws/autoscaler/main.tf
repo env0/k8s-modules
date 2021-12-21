@@ -4,7 +4,7 @@ data "aws_eks_cluster" "cluster" {
 
 data "aws_eks_node_group" "node_group" {
   cluster_name    = var.cluster_name
-  node_group_name = "deployment"
+  node_group_name = "${var.cluster_name}-deployment-node-group"
 }
 
 module "oidc-provider-data" {

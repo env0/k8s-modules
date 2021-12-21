@@ -2,6 +2,15 @@ data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
 
+data "aws_subnet_ids" "private" {
+  vpc_id = var.vpc_id
+
+  tags = {
+    tier = "private"
+  }
+}
+
+
 module "efs" {
   depends_on = [data.aws_eks_cluster.cluster]
 
@@ -11,9 +20,10 @@ module "efs" {
   region = var.region
 
   vpc_id  = var.vpc_id
-  subnets = var.private_subnets
+  subnets = data.aws_subnet_ids.private.ids
 
-  transition_to_ia = "AFTER_7_DAYS"
+  security_group_name = "${var.cluster_name}-sg-efs"
+  transition_to_ia    = "AFTER_7_DAYS"
 
   // NOTE: the module is stupid and puts this tag on the security group and access point as well
   tags = {

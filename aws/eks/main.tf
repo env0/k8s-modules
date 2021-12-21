@@ -28,6 +28,7 @@ module "eks" {
 
   node_groups = {
     deployment = {
+      name = "${var.cluster_name}-deployment-node-group"
       desired_capacity = var.min_capacity
       max_capacity     = 50
       min_capacity     = var.min_capacity

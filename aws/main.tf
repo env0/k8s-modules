@@ -19,10 +19,9 @@ module "eks" {
 }
 
 module "efs" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source     = "./efs"
 
-  private_subnets = var.private_subnets
   region          = var.region
   vpc_id          = module.vpc.vpc_id
   cluster_name    = var.cluster_name
