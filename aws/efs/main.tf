@@ -2,15 +2,6 @@ data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = var.vpc_id
-
-  tags = {
-    tier = "private"
-  }
-}
-
-
 module "efs" {
   depends_on = [data.aws_eks_cluster.cluster]
 
@@ -20,7 +11,7 @@ module "efs" {
   region = var.region
 
   vpc_id  = var.vpc_id
-  subnets = data.aws_subnet_ids.private.ids
+  subnets = var.subnets
 
   transition_to_ia    = "AFTER_7_DAYS"
 
