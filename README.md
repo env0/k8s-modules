@@ -2,7 +2,7 @@
 This repository contains live examples for creation of kubernetes cluster which can run env0 deployments.
 you can take those examples and use them as-is or fork the repo and adjustment for yourself.
 
-you can build mix of the modules (csi-driver) if you liked
+you can build a mix of the modules (csi-driver) if you like
 
 ### AWS 
 #### providers.tf
