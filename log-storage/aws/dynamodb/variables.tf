@@ -1,7 +1,3 @@
-variable "region" {
-  default = "us-east-1"
-}
-
 variable "external_id" {
   description = "An external ID provided by env0 for assuming the roles to read and write from and to log table"
 }
