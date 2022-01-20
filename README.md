@@ -69,6 +69,8 @@ module "csi-driver" {
   efs_id = var.efs_id
 }
 ```
+#### Alternative Log Storage
+You can store the deployment logs on your own cloud provider, for supported cloud providers. See `log-storage/README.md` for more details
 ### Installing the env0 agent
 If you'd like, you can also install the env0 agent using terraform.
 Make sure you fill out 
