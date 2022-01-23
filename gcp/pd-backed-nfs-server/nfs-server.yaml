@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: env0-nfs-server
+  namespace: env0-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: env0-nfs-server
+  template:
+    metadata:
+      labels:
+        role: env0-nfs-server
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: ${pdZone}
+      containers:
+      - name: nfs-server
+        image: gcr.io/google_containers/volume-nfs:0.8
+        ports:
+          - name: nfs
+            containerPort: 2049
+          - name: mountd
+            containerPort: 20048
+          - name: rpcbind
+            containerPort: 111
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - mountPath: /data
+            name: nfs-pvc
+      volumes:
+        - name: nfs-pvc
+          gcePersistentDisk:
+            pdName: ${pdName}
+            fsType: ext4
+      
+
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: env0-nfs-server
+  namespace: env0-agent
+spec:
+  ports:
+    - name: nfs
+      port: 2049
+    - name: mountd
+      port: 20048
+    - name: rpcbind
+      port: 111
+  selector:
+    role: env0-nfs-server
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: env0-nfs-pv
+  namespace: env0-agent
+spec:
+  capacity:
+    storage: 300Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: env0-nfs-server.env0-agent.svc.cluster.local
+    path: "/"
