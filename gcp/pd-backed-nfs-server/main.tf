@@ -39,6 +39,6 @@ data "kubectl_file_documents" "nfs_server_k8s_docs" {
 
 // Applies the K8S manifests
 resource "kubectl_manifest" "nfs_server_k8s_manifest" {
-  for_each  = data.kubectl_file_documents.nfs_server_k8s_docs.manifests
+  for_each  = toset(data.kubectl_file_documents.nfs_server_k8s_docs.documents)
   yaml_body = each.value
 }
