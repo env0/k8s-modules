@@ -22,3 +22,4 @@ spec:
           values:
           topology.kubernetes.io/zone:
           - us-central1-a
+          - us-central1-b
