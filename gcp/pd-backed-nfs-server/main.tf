@@ -13,10 +13,10 @@ data "template_file" "nfs_server_k8s_yaml" {
 }
 
 data "kubectl_file_documents" "nfs_server_k8s_docs" {
-  content = data.nfs_server_k8s_yaml.rendered
+  content = data.template_file.nfs_server_k8s_yaml.rendered
 }
 
 resource "kubectl_manifest" "nfs_server_k8s_manifest" {
-  for_each  = data.nfs_server_k8s_docs.docs.manifests
+  for_each  = data.kubectl_file_documents.nfs_server_k8s_docs.docs.manifests
   yaml_body = each.value
 }
