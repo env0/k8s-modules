@@ -33,7 +33,7 @@ data "template_file" "deployment_yaml" {
 }
 
 resource "kubectl_manifest" "nfs_server_deployment" {
-  yaml_body = data.template_file.nfs_server_k8s_yaml.rendered
+  yaml_body = data.template_file.deployment_yaml.rendered
 }
 
 resource "kubectl_manifest" "nfs_server_service" {
