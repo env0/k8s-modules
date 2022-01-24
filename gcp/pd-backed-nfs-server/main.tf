@@ -21,7 +21,7 @@ resource "google_compute_disk" "env0_internal_state_disk" {
   name = "env0-internal-state-disk"
   type = "pd-ssd"
   size = "300" // GB
-  zone = var.cluster_location
+  zone = "${var.cluster_location}-a"
 }
 
 // K8S 
