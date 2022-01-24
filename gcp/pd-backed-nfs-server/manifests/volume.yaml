@@ -4,6 +4,7 @@ metadata:
   name: env0-nfs-pv
   namespace: env0-agent
 spec:
+  storageClassName: env0-state-sc
   capacity:
     storage: 300Gi
   accessModes:
