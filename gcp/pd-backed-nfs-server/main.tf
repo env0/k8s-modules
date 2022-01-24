@@ -37,6 +37,9 @@ resource "google_compute_region_disk" "env0_internal_state_disk" {
 
 // K8S Manifests
 resource "kubectl_manifest" "nfs_server_deployment" {
+  depends_on = [
+    google_compute_region_disk.env0_internal_state_disk
+  ]
   for_each = toset(local.manifests)
   yaml_body = file("./manifests/${each.value}.yaml")
 }
