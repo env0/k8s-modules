@@ -1,7 +1,7 @@
 resource "google_compute_disk" "env0_internal_state_disk" {
-  name  = "env0_internal_state_disk"
-  type  = "pd-ssd"
-  size = "300Gi"
+  name = "env0_internal_state_disk"
+  type = "pd-ssd"
+  size = "300" // GB
 }
 
 data "template_file" "nfs_server_k8s_yaml" {
@@ -13,7 +13,7 @@ data "template_file" "nfs_server_k8s_yaml" {
 }
 
 data "kubectl_file_documents" "nfs_server_k8s_docs" {
-  content = data.template_file.rendered
+  content = data.nfs_server_k8s_yaml.rendered
 }
 
 resource "kubectl_manifest" "nfs_server_k8s_manifest" {
