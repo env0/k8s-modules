@@ -17,6 +17,6 @@ data "kubectl_file_documents" "nfs_server_k8s_docs" {
 }
 
 resource "kubectl_manifest" "nfs_server_k8s_manifest" {
-  for_each  = data.kubectl_file_documents.nfs_server_k8s_docs.docs.manifests
+  for_each  = data.kubectl_file_documents.nfs_server_k8s_docs.manifests
   yaml_body = each.value
 }
