@@ -32,7 +32,7 @@ resource "google_compute_region_disk" "env0_internal_state_disk" {
   type = "pd-ssd"
   size = "300" // GB
   region = "us-central1"
-  replica_zones = [ "us-central1-a", "us-central1-b", ]
+  replica_zones = [ "us-central1-a" ]
 }
 
 // K8S Manifests
