@@ -1,3 +1,13 @@
+locals {
+  manifests = [
+    "deployment",
+    "pv-for-deployment-pods",
+    "pv-for-nfs-server",
+    "pvc-for-nfs-server",
+    "service",
+  ]
+}
+
 provider "kubectl" {
   host = "https://${data.google_container_cluster.my_cluster.endpoint}"
   cluster_ca_certificate = base64decode(
@@ -17,30 +27,17 @@ data "google_container_cluster" "my_cluster" {
 }
 
 // The disk used to back the NFS Server
-resource "google_compute_disk" "env0_internal_state_disk" {
+resource "google_compute_region_disk" "env0_internal_state_disk" {
   name = "env0-internal-state-disk"
   type = "pd-ssd"
   size = "300" // GB
-  zone = "${var.cluster_location}-a"
+  region = "us-central1"
+  replica_zones = [ "us-central1-a", "us-central1-b", ]
 }
 
-// K8S 
-data "template_file" "deployment_yaml" {
-  template = file("./manifests/deployment.yaml")
-  vars = {
-    pdName = google_compute_disk.env0_internal_state_disk.name
-    pdZone = google_compute_disk.env0_internal_state_disk.zone
-  }
-}
-
+// K8S Manifests
 resource "kubectl_manifest" "nfs_server_deployment" {
-  yaml_body = data.template_file.deployment_yaml.rendered
+  for_each = local.manifests
+  yaml_body = file("./manifests/${each.value}.yaml")
 }
 
-resource "kubectl_manifest" "nfs_server_service" {
-  yaml_body = file("./manifests/service.yaml")
-}
-
-resource "kubectl_manifest" "nfs_server_volume" {
-  yaml_body = file("./manifests/volume.yaml")
-}

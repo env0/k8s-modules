@@ -14,7 +14,7 @@ spec:
         role: env0-nfs-server
     spec:
       nodeSelector:
-        topology.kubernetes.io/zone: ${pdZone}
+        topology.kubernetes.io/zone: us-central1-a__us-central1-b
       containers:
       - name: nfs-server
         image: gcr.io/google_containers/volume-nfs:0.8
@@ -32,6 +32,5 @@ spec:
             name: nfs-pvc
       volumes:
         - name: nfs-pvc
-          gcePersistentDisk:
-            pdName: ${pdName}
-            fsType: ext4    
+          persistentVolumeClaim:
+            claimName: postgres-static-data-pv-claim          
