@@ -40,6 +40,6 @@ resource "kubectl_manifest" "nfs_server_service" {
   yaml_body = file("./manifests/service.yaml")
 }
 
-resource "kubectl_manifest" "nfs_server_deployment" {
+resource "kubectl_manifest" "nfs_server_volume" {
   yaml_body = file("./manifests/volume.yaml")
 }
