@@ -29,7 +29,7 @@ data "google_container_cluster" "my_cluster" {
 // The disk used to back the NFS Server
 resource "google_compute_region_disk" "env0_internal_state_disk" {
   name = "env0-internal-state-disk"
-  type = "pd-ssd"
+  type = "pd-standard"
   size = "300" // GB
   region = "us-central1"
   replica_zones = [ "us-central1-a", "us-central1-b", ]
