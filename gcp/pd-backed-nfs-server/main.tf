@@ -23,25 +23,23 @@ resource "google_compute_disk" "env0_internal_state_disk" {
   size = "300" // GB
 }
 
-// The kubectl full manifest
-data "template_file" "nfs_server_k8s_yaml" {
-  template = file("./nfs-server.yaml")
+// K8S 
+data "template_file" "deployment_yaml" {
+  template = file("./manifests/deployment.yaml")
   vars = {
     pdName = google_compute_disk.env0_internal_state_disk.name
     pdZone = google_compute_disk.env0_internal_state_disk.zone
   }
 }
 
-// Used to split the K8S manifest to the separate components
-data "kubectl_file_documents" "nfs_server_k8s_docs" {
-  content = data.template_file.nfs_server_k8s_yaml.rendered
+resource "kubectl_manifest" "nfs_server_deployment" {
+  yaml_body = data.template_file.nfs_server_k8s_yaml.rendered
 }
 
-// Applies the K8S manifests
-resource "kubectl_manifest" "nfs_server_k8s_manifest" {
-  depends_on = [
-    data.kubectl_file_documents.nfs_server_k8s_docs
-  ]
-  for_each  = data.kubectl_file_documents.nfs_server_k8s_docs.manifests
-  yaml_body = each.value
+resource "kubectl_manifest" "nfs_server_service" {
+  yaml_body = file("./manifests/service.yaml")
+}
+
+resource "kubectl_manifest" "nfs_server_deployment" {
+  yaml_body = file("./manifests/volume.yaml")
 }
