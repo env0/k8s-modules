@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: env0-pv-for-nfs-server
+  namespace: env0-agent
+spec:
+  storageClassName: env0-sc-for-nfs-server
+  capacity:
+    storage: 300Gi
+  accessModes:
+  - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: env0-internal-state-disk
+    fsType: ext4
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        # failure-domain.beta.kubernetes.io/zone should be used prior to 1.21
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values:
+          - us-central1-a
+          - us-central1-b

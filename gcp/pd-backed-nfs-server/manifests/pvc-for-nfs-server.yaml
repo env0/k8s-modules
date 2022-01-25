@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: env0-pvc-for-nfs-server
+  namespace: env0-agent
+spec:
+  storageClassName: env0-sc-for-nfs-server
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 300Gi
