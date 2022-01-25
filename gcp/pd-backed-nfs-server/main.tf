@@ -23,6 +23,6 @@ resource "kubectl_manifest" "nfs_server_deployment" {
     google_compute_region_disk.env0_internal_state_disk
   ]
   for_each = toset(local.manifests)
-  yaml_body = file("./manifests/${each.value}.yaml")
+  yaml_body = file("${path.module}/manifests/${each.value}.yaml")
 }
 
