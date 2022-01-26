@@ -43,23 +43,20 @@ module "eks-cluster-autoscaler" {
     #  scale-down-utilization-threshold: local.single_deployment_pod_utilization_of_node_resources
     #}
   })
+
+  workers_group_defaults = {
+    protect_from_scale_in = true
+    suspended_processes   = ['AZRebalance']
+    default_cooldown      = 60
+    enabled_metrics       = ['GroupMinSize',
+      'GroupMaxSize',
+      'GroupDesiredCapacity',
+      'GroupInServiceInstances',
+      'GroupPendingInstances',
+      'GroupStandbyInstances',
+      'GroupTerminatingInstances',
+      'GroupTotalInstances']
+  }
 }
 
 # https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws#common-notes-and-gotchas
-module "suspend_asg_processes_command" {
-  source           = "digitickets/cli/aws"
-  version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "suspend-processes", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--scaling-processes AZRebalance"]
-}
-
-module "set_asg_default_cooldown_command" {
-  source           = "digitickets/cli/aws"
-  version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "update-auto-scaling-group", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--default-cooldown 60"]
-}
-
-module "enable_asg_metrics_collection" {
-  source           = "digitickets/cli/aws"
-  version          = "4.1.0"
-  aws_cli_commands = ["autoscaling", "enable-metrics-collection ", "--auto-scaling-group-name ${local.autoscaling_group_name}", "--granularity \"1Minute\""]
-}
