@@ -2,15 +2,6 @@ data "aws_eks_cluster" "cluster" {
   name = var.cluster_name
 }
 
-module "oidc-provider-data" {
-  depends_on = [data.aws_eks_cluster.cluster]
-
-  source     = "reegnz/oidc-provider-data/aws"
-  version    = "0.0.3"
-
-  issuer_url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
-}
-
 locals {
   cluster_oidc_issuer_url = flatten(concat(data.aws_eks_cluster.cluster.identity[*].oidc[0].issuer, [""]))[0]
   oidc_without_http = replace(local.cluster_oidc_issuer_url, "https://", "")
@@ -24,7 +15,7 @@ resource "aws_iam_role" "role_with_web_identity_oidc" {
       {
         Effect : "Allow",
         Principal : {
-          "Federated" : "${module.oidc-provider-data.arn}"
+          "Federated" : var.arn
         },
         Action : "sts:AssumeRoleWithWebIdentity",
         Condition : {

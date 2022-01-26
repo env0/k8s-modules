@@ -1,3 +1,10 @@
+
+module "oidc-provider-data" {
+  depends_on = [module.eks]
+  source = './oidc-provider-data'
+  cluster_name = var.cluster_name
+}
+
 module "vpc" {
   source = "./vpc"
 
@@ -36,9 +43,9 @@ module "autoscaler" {
 }
 
 module "csi_driver" {
-  depends_on = [module.efs]
+  depends_on = [module.efs, module.oidc-provider-data]
   source     = "./csi-driver"
-
+  arn = module.oidc-provider-data.arn
   efs_id         = module.efs.efs_id
   reclaim_policy = var.reclaim_policy
   cluster_name   = var.cluster_name
