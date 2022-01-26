@@ -1,7 +1,7 @@
 
 module "oidc-provider-data" {
   depends_on = [module.eks]
-  source = './oidc-provider-data'
+  source = "./oidc-provider-data"
   cluster_name = var.cluster_name
 }
 
