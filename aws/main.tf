@@ -36,16 +36,16 @@ module "efs" {
 }
 
 module "autoscaler" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.oidc-provider-data]
   source     = "./autoscaler"
-
+  eks_oidc_provider_arn = module.oidc-provider-data.arn
   cluster_name = var.cluster_name
 }
 
 module "csi_driver" {
   depends_on = [module.efs, module.oidc-provider-data]
   source     = "./csi-driver"
-  arn = module.oidc-provider-data.arn
+  eks_oidc_provider_arn = module.oidc-provider-data.arn
   efs_id         = module.efs.efs_id
   reclaim_policy = var.reclaim_policy
   cluster_name   = var.cluster_name

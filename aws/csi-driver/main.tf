@@ -15,7 +15,7 @@ resource "aws_iam_role" "role_with_web_identity_oidc" {
       {
         Effect : "Allow",
         Principal : {
-          "Federated" : var.arn
+          "Federated" : var.eks_oidc_provider_arn
         },
         Action : "sts:AssumeRoleWithWebIdentity",
         Condition : {

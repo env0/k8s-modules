@@ -7,13 +7,6 @@ data "aws_eks_node_group" "node_group" {
   node_group_name = "${var.cluster_name}-deployment-node-group"
 }
 
-module "oidc-provider-data" {
-  source     = "reegnz/oidc-provider-data/aws"
-  version    = "0.0.3"
-
-  issuer_url = data.aws_eks_cluster.cluster.identity[0].oidc[0].issuer
-}
-
 locals {
   cluster_oidc_issuer_url = flatten(concat(data.aws_eks_cluster.cluster.identity[*].oidc[0].issuer, [""]))[0]
   autoscaling_group_name = data.aws_eks_node_group.node_group.resources.0.autoscaling_groups.0.name
@@ -25,7 +18,8 @@ module "eks-cluster-autoscaler" {
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
-  cluster_identity_oidc_issuer_arn = module.oidc-provider-data.arn
+  cluster_identity_oidc_issuer_arn = var.eks_oidc_provider_arn
+
 
   helm_chart_version = "9.9.2"
 

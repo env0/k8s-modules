@@ -6,4 +6,4 @@ variable "reclaim_policy" {
 
 variable "efs_id" {}
 
-variable arn {}
+variable "eks_oidc_provider_arn" {}
