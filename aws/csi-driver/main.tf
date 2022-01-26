@@ -79,29 +79,28 @@ resource "aws_iam_role" "role_with_web_identity_oidc" {
   }
 }
 
-
-resource "kubectl_manifest" "csi_service_account" {
+resource "kubernetes_service_account" "csi_service_account" {
   # Without the extra labels / annotations Helm fails the deployment - invalid ownership metadata error
-  yaml_body = <<YAML
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: efs-csi-controller-sa
-  namespace: kube-system
-  labels:
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: aws-efs-csi-driver
-  annotations:
-    meta.helm.sh/release-name: aws-efs-csi-driver
-    meta.helm.sh/release-namespace: kube-system
-    eks.amazonaws.com/role-arn: ${aws_iam_role.role_with_web_identity_oidc.arn}
-YAML
+  metadata {
+    name = "efs-csi-controller-sa"
+    namespace = "kube-system"
+    labels = {
+      "app.kubernetes.io/managed-by": "Helm"
+      "app.kubernetes.io/name": "aws-efs-csi-driver"
+    }
+    annotations = {
+      "meta.helm.sh/release-name": "aws-efs-csi-driver"
+      "meta.helm.sh/release-namespace": "kube-system"
+      "eks.amazonaws.com/role-arn": aws_iam_role.role_with_web_identity_oidc.arn
+    }
+  }
 }
+
 
 resource "helm_release" "kubernetes_efs_csi_driver" {
   depends_on = [
     aws_iam_role.role_with_web_identity_oidc,
-    kubectl_manifest.csi_service_account
+    kubernetes_service_account.csi_service_account
   ]
   name       = "aws-efs-csi-driver"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
@@ -128,18 +127,17 @@ resource "helm_release" "kubernetes_efs_csi_driver" {
   }
 }
 
-resource "kubectl_manifest" "storage_class" {
-  yaml_body  = <<YAML
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: env0-state-sc
-provisioner: efs.csi.aws.com
-reclaimPolicy: ${var.reclaim_policy}
-parameters:
-  provisioningMode: efs-ap
-  fileSystemId: ${var.efs_id}
-  directoryPerms: "700"
-YAML
+resource "kubernetes_storage_class" "storage_class" {
   depends_on = [helm_release.kubernetes_efs_csi_driver]
+
+  storage_provisioner = "efs.csi.aws.com"
+  reclaim_policy = var.reclaim_policy
+  metadata {
+    name = "env0-state-sc"
+  }
+  parameters = {
+    provisioningMode: "efs-ap"
+    fileSystemId: var.efs_id
+    directoryPerms: "700"
+  }
 }
