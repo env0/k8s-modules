@@ -136,8 +136,8 @@ resource "kubernetes_storage_class" "storage_class" {
     name = "env0-state-sc"
   }
   parameters = {
-    provisioningMode: "efs-ap"
-    fileSystemId: var.efs_id
-    directoryPerms: "700"
+    provisioningMode = "efs-ap"
+    fileSystemId = var.efs_id
+    directoryPerms = "700"
   }
 }
