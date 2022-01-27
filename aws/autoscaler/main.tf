@@ -43,20 +43,6 @@ module "eks-cluster-autoscaler" {
     #  scale-down-utilization-threshold: local.single_deployment_pod_utilization_of_node_resources
     #}
   })
-
-  workers_group_defaults = {
-    protect_from_scale_in = true
-    suspended_processes   = ['AZRebalance']
-    default_cooldown      = 60
-    enabled_metrics       = ['GroupMinSize',
-      'GroupMaxSize',
-      'GroupDesiredCapacity',
-      'GroupInServiceInstances',
-      'GroupPendingInstances',
-      'GroupStandbyInstances',
-      'GroupTerminatingInstances',
-      'GroupTotalInstances']
-  }
 }
 
 # https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws#common-notes-and-gotchas

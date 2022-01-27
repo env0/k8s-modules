@@ -24,6 +24,16 @@ module "eks" {
 
   workers_group_defaults = {
     protect_from_scale_in = true
+    suspended_processes   = ["AZRebalance"]
+    default_cooldown      = 60
+    enabled_metrics       = ["GroupMinSize",
+      "GroupMaxSize",
+      "GroupDesiredCapacity",
+      "GroupInServiceInstances",
+      "GroupPendingInstances",
+      "GroupStandbyInstances",
+      "GroupTerminatingInstances",
+      "GroupTotalInstances"]
   }
 
   node_groups = {
