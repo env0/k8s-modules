@@ -30,6 +30,10 @@ spec:
         volumeMounts:
           - mountPath: /data
             name: nfs-pvc
+        resources:
+          limits:
+            cpu: 250m
+            memory: 1000Mi
       volumes:
         - name: nfs-pvc
           persistentVolumeClaim:
