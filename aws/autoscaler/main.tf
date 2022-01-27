@@ -12,13 +12,18 @@ locals {
   autoscaling_group_name = data.aws_eks_node_group.node_group.resources.0.autoscaling_groups.0.name
 }
 
+module "oidc-provider-data" {
+  source = "../oidc-provider-data"
+  cluster_name = var.cluster_name
+}
+
 module "eks-cluster-autoscaler" {
   source  = "lablabs/eks-cluster-autoscaler/aws"
   version = "1.6.1"
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
-  cluster_identity_oidc_issuer_arn = var.eks_oidc_provider_arn
+  cluster_identity_oidc_issuer_arn = module.oidc-provider-data.arn
 
 
   helm_chart_version = "9.9.2"

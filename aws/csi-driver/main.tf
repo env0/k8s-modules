@@ -7,6 +7,11 @@ locals {
   oidc_without_http = replace(local.cluster_oidc_issuer_url, "https://", "")
 }
 
+module "oidc-provider-data" {
+  source = "../oidc-provider-data"
+  cluster_name = var.cluster_name
+}
+
 resource "aws_iam_role" "role_with_web_identity_oidc" {
   name               = "${var.cluster_name}_AmazonEKS_EFS_CSI_DriverRole"
   assume_role_policy = jsonencode({
@@ -15,7 +20,7 @@ resource "aws_iam_role" "role_with_web_identity_oidc" {
       {
         Effect : "Allow",
         Principal : {
-          "Federated" : var.eks_oidc_provider_arn
+          "Federated" : module.oidc-provider-data.arn
         },
         Action : "sts:AssumeRoleWithWebIdentity",
         Condition : {
