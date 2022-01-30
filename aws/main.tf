@@ -1,3 +1,4 @@
+
 module "vpc" {
   source = "./vpc"
 
@@ -31,14 +32,12 @@ module "efs" {
 module "autoscaler" {
   depends_on = [module.eks]
   source     = "./autoscaler"
-
   cluster_name = var.cluster_name
 }
 
 module "csi_driver" {
   depends_on = [module.efs]
   source     = "./csi-driver"
-
   efs_id         = module.efs.efs_id
   reclaim_policy = var.reclaim_policy
   cluster_name   = var.cluster_name
