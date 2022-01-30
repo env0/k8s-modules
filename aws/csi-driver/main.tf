@@ -132,6 +132,7 @@ resource "kubernetes_storage_class" "storage_class" {
 
   storage_provisioner = "efs.csi.aws.com"
   reclaim_policy = var.reclaim_policy
+  allow_volume_expansion = true
   metadata {
     name = "env0-state-sc"
   }
