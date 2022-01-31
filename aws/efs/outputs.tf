@@ -1,4 +1,4 @@
 output "efs_id" {
-  value       = module.efs[0].id
+  value       = module.efs.id
   description = "EFS id"
 }

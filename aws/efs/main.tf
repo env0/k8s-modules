@@ -34,7 +34,7 @@ module "efs" {
 }
 
 resource "aws_efs_backup_policy" "policy" {
-  file_system_id = module.efs[0].id
+  file_system_id = module.efs.id
 
   backup_policy {
     status = "ENABLED"
