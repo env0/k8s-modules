@@ -44,3 +44,55 @@ variable "instance_type" {
 variable "reclaim_policy" {
   default = "Retain"
 }
+
+variable "vpc" {
+  type = object({
+    create = bool
+    vpc_id = string
+  })
+  default = {
+    create = true
+    vpc_id = ""
+  }
+  description = "should create a vpc or provisioned by user"
+
+  validation {
+    condition = !(var.create_vpc.create == false && var.create_vpc.vpc_id == "")
+    errerror_message = "you must specify vpc_id if you don't want it to be created"
+  }
+}
+
+variable "create_eks" {
+  type = bool
+  default = true
+  description = "should create an eks or provisioned by user"
+}
+
+variable "efs" {
+  type = object({
+    create = bool
+    efs_id = string
+  })
+  default = {
+    create = true
+    efs_id = ""
+  }
+  description = "should create an efs or provisioned by user"
+
+  validation {
+    condition = !(var.create_efs.create == false && var.create_efs.efs_id == "")
+    errerror_message = "you must specify efs_id if you don't want it to be created"
+  }
+}
+
+variable "create_autoscaler" {
+  type = bool
+  default = true
+  description = "should create an autoscaler or provisioned by user"
+}
+
+variable "create_csi_driver" {
+  type = bool
+  default = true
+  description = "should create a csi driver or provisioned by user"
+}
