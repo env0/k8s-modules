@@ -28,7 +28,7 @@ module "efs" {
   region       = var.region
   vpc_id       = var.vpc.create ? module.vpc[0].vpc_id : var.vpc.vpc_id
   cluster_name = var.cluster_name
-  subnets      = module.vpc.private_subnets
+  subnets      = var.vpc.create ? module.vpc[0].private_subnets : var.vpc.private_subnets
 }
 
 module "autoscaler" {

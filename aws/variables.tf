@@ -49,15 +49,17 @@ variable "vpc" {
   type = object({
     create = bool
     vpc_id = string
+    private_subnets = list(string)
   })
   default = {
     create = true
     vpc_id = ""
+    private_subnets = []
   }
   description = "should create a vpc or provisioned by user"
 
   validation {
-    condition = !(var.vpc.create == false && var.vpc.vpc_id == "")
+    condition = !(var.vpc.create == false && (var.vpc.vpc_id == "" || length(var.vpc.private_subnets) == 0))
     error_message = "You must specify vpc_id if you don't want it to be created."
   }
 }
