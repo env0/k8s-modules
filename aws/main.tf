@@ -1,4 +1,3 @@
-
 module "vpc" {
   count           = var.vpc.create ? 1 : 0
   source          = "./vpc"
