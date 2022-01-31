@@ -40,7 +40,7 @@ module "autoscaler" {
 }
 
 module "csi_driver" {
-  count      = var.csi_driver ? 1 : 0
+  count      = var.create_csi_driver ? 1 : 0
   depends_on = [module.efs]
   source     = "./csi-driver"
 
