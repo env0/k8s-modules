@@ -10,7 +10,7 @@ module "vpc" {
 
 module "eks" {
   depends_on = [module.vpc]
-  count         = var.create_eks ? 1 : 0
+  count         = var.eks.create ? 1 : 0
   source     = "./eks"
 
   vpc_id        = var.vpc.create ? module.vpc[0].vpc_id : var.vpc.vpc_id

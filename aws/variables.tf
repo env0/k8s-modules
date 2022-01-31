@@ -62,9 +62,24 @@ variable "vpc" {
   }
 }
 
-variable "create_eks" {
-  type = bool
-  default = true
+variable "eks" {
+    type = object({
+    create          = bool
+    kubernetes_host = string
+    cluster_id      = string
+  })
+
+  default = {
+    create = true
+    kubernetes_host = ""
+    cluster_id      = ""
+  }
+
+  validation {
+    condition = !(var.eks.create == false && (var.eks.kubernetes_host == "" || var.eks.cluster_id == ""))
+    error_message = "You must specify kubernetes_host and cluster_id if you don't want it to be created."
+  }
+
   description = "should create an eks or provisioned by user"
 }
 
