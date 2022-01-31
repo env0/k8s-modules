@@ -57,8 +57,8 @@ variable "vpc" {
   description = "should create a vpc or provisioned by user"
 
   validation {
-    condition = !(var.create_vpc.create == false && var.create_vpc.vpc_id == "")
-    errerror_message = "you must specify vpc_id if you don't want it to be created"
+    condition = !(var.vpc.create == false && var.vpc.vpc_id == "")
+    error_message = "you must specify vpc_id if you don't want it to be created"
   }
 }
 
@@ -80,8 +80,8 @@ variable "efs" {
   description = "should create an efs or provisioned by user"
 
   validation {
-    condition = !(var.create_efs.create == false && var.create_efs.efs_id == "")
-    errerror_message = "you must specify efs_id if you don't want it to be created"
+    condition = !(var.efs.create == false && var.efs.efs_id == "")
+    error_message = "you must specify efs_id if you don't want it to be created"
   }
 }
 
