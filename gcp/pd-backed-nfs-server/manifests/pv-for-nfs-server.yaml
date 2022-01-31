@@ -15,9 +15,17 @@ spec:
     required:
       nodeSelectorTerms:
       - matchExpressions:
-        # failure-domain.beta.kubernetes.io/zone should be used prior to 1.21
         - key: topology.kubernetes.io/zone
           operator: In
           values:
           - us-central1-a
           - us-central1-b
+        - key: failure-domain.beta.kubernetes.io/zone
+          operator: In
+          values:
+          - us-central1-a
+          - us-central1-b
+        - key: failure-domain.beta.kubernetes.io/region
+          operator: In
+          values:
+          - us-central1
