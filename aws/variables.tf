@@ -58,7 +58,7 @@ variable "vpc" {
 
   validation {
     condition = !(var.vpc.create == false && var.vpc.vpc_id == "")
-    error_message = "you must specify vpc_id if you don't want it to be created"
+    error_message = "You must specify vpc_id if you don't want it to be created."
   }
 }
 
@@ -81,7 +81,7 @@ variable "efs" {
 
   validation {
     condition = !(var.efs.create == false && var.efs.efs_id == "")
-    error_message = "you must specify efs_id if you don't want it to be created"
+    error_message = "You must specify efs_id if you don't want it to be created."
   }
 }
 
