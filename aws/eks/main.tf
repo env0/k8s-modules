@@ -26,6 +26,7 @@ module "eks" {
     protect_from_scale_in = true
     suspended_processes   = ["AZRebalance"]
     default_cooldown      = 60
+    enable_monitoring     = true
     enabled_metrics       = ["GroupMinSize",
       "GroupMaxSize",
       "GroupDesiredCapacity",
