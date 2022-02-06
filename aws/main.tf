@@ -1,6 +1,6 @@
 data aws_vpc "my_vpc" {
   count = var.vpc.create ? 0 : 1
-  id = var.vpc.id
+  id = var.vpc.vpc_id
 }
 
 data aws_eks_cluster "my_eks" {
