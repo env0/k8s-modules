@@ -96,8 +96,8 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(var.modules_info.eks.create == false && (var.modules_info.eks.kubernetes_host == "" || var.modules_info.eks.cluster_id == ""))
-    error_message = "You must specify kubernetes_host and cluster_id if you don't want the eks to be created."
+    condition = !(var.modules_info.eks.create == false && var.modules_info.eks.cluster_id == "")
+    error_message = "You must specify cluster_id if you don't want the eks to be created."
   }
 
   validation {
@@ -106,7 +106,7 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(!var.modules_info.efs.create == false && var.modules_info.efs.create)
+    condition = !(!var.modules_info.efs.create && var.modules_info.efs.create)
     error_message = "You can't proviosn efs without eks."
   }
 
