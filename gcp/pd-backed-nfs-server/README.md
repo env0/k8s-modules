@@ -11,4 +11,4 @@ To be used for saving the env0 internal state on a persistent disk, which is nee
 1. `pv-for-deployment-pods` - The PV that the env0-agent PVC will be bound to, also using `storageClassName`.
 
 ## Providers
-Requires the `google` and `gavinbunney/kubectl` providers to be configured, see `main.tf` in parent folder.
+Requires the `google` and `kubernetes` providers to be configured, see `main.tf` in parent folder.
