@@ -1,8 +1,3 @@
-data aws_vpc "my_vpc" {
-  count = var.vpc.create ? 0 : 1
-  id = var.vpc.vpc_id
-}
-
 data aws_eks_cluster "my_eks" {
   count = var.eks.create ? 0 : 1
   name = var.eks.cluster_id
@@ -10,7 +5,7 @@ data aws_eks_cluster "my_eks" {
 
 locals {
   vpc_id = (var.efs.create && var.eks.create && var.vpc.create) ? module.vpc[0].vpc_id : var.vpc.vpc_id
-  private_subnets = (var.efs.create && var.eks.create && var.vpc.create) ? module.vpc[0].private_subnets : data.aws_vpc.my_vpc[0].private_subnets
+  private_subnets = (var.efs.create && var.eks.create && var.vpc.create) ? module.vpc[0].private_subnets : var.vpc.private_subnets
   efs_id = var.efs.create ? module.efs[0].efs_id : var.efs.efs_id
 }
 
