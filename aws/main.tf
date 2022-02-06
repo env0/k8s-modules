@@ -1,3 +1,19 @@
+data aws_vpc "my_vpc" {
+  count = var.vpc.create ? 0 : 1
+  id = var.vpc_id
+}
+
+data aws_eks_cluster "my_eks" {
+  count = var.eks.create ? 0 : 1
+  name = var.eks.name
+}
+
+locals {
+  vpc_id = (var.efs.create && var.eks.create && var.vpc.create) ? module.vpc[0].vpc_id : var.vpc.vpc_id
+  private_subnets = (var.efs.create && var.eks.create && var.vpc.create) ? module.vpc[0].private_subnets : data.aws_vpc.my_vpc[0].private_subnets
+  efs_id = var.efs.create ? module.efs[0].efs_id : var.efs.efs_id
+}
+
 module "vpc" {
   count           = var.vpc.create ? 1 : 0
   source          = "./vpc"
@@ -13,7 +29,7 @@ module "eks" {
   count         = var.eks.create ? 1 : 0
   source     = "./eks"
 
-  vpc_id        = var.vpc.create ? module.vpc[0].vpc_id : var.vpc.vpc_id
+  vpc_id        = local.vpc_id
   cluster_name  = var.cluster_name
   map_roles     = var.map_roles
   min_capacity  = var.min_capacity
@@ -26,9 +42,9 @@ module "efs" {
   source       = "./efs"
 
   region       = var.region
-  vpc_id       = var.vpc.create ? module.vpc[0].vpc_id : var.vpc.vpc_id
+  vpc_id       = local.vpc_id
   cluster_name = var.cluster_name
-  subnets      = var.vpc.create ? module.vpc[0].private_subnets : var.vpc.private_subnets
+  subnets      = local.private_subnets
 }
 
 module "autoscaler" {
@@ -44,7 +60,7 @@ module "csi_driver" {
   depends_on = [module.efs]
   source     = "./csi-driver"
 
-  efs_id         = var.efs.create ? module.efs[0].efs_id : var.efs.efs_id
+  efs_id         = local.efs_id
   reclaim_policy = var.reclaim_policy
   cluster_name   = var.cluster_name
 }
