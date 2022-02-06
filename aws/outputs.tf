@@ -1,5 +1,5 @@
 output "kubernetes_host" {
-  value       = var.eks.create ? module.eks[0].kubernetes_host : data.aws_eks_cluster.my_eks[0].kubernetes_host
+  value       = var.eks.create ? module.eks[0].kubernetes_host : data.aws_eks_cluster.my_eks[0].endpoint
   description = "EKS cluster host endpoint"
 }
 
