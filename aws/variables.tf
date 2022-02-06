@@ -91,7 +91,7 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(var.modules_info.vpc.create == false && (var.modules_info.vpc.id == "" || length(var.vpc.private_subnets) == 0))
+    condition = !(var.modules_info.vpc.create == false && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets) == 0))
     error_message = "You must specify vpc_id if and private_subnets you don't want the vpc to be created."
   }
 
