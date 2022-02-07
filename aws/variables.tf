@@ -91,12 +91,12 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(var.modules_info.vpc.create == false && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets) == 0))
-    error_message = "You must specify vpc_id if and private_subnets you don't want the vpc to be created."
+    condition = !(!var.modules_info.vpc.create && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets) == 0))
+    error_message = "You must specify vpc_id and private_subnets if you don't want the vpc to be created."
   }
 
   validation {
-    condition = !(var.modules_info.eks.create == false && var.modules_info.eks.cluster_id == "")
+    condition = !(!var.modules_info.eks.create && var.modules_info.eks.cluster_id == "")
     error_message = "You must specify cluster_id if you don't want the eks to be created."
   }
 

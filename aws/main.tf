@@ -4,9 +4,9 @@ data aws_eks_cluster "my_eks" {
 }
 
 locals {
-  vpc_id = (var.modules_info.efs.create && var.modules_info.eks.create && var.modules_info.vpc.create) ? module.vpc[0].vpc_id : var.modules_info.vpc.id
-  private_subnets = (var.modules_info.efs.create && var.modules_info.eks.create && var.modules_info.vpc.create) ? module.vpc[0].private_subnets : var.modules_info.vpc.private_subnets
-  efs_id = var.modules_info.efs.create ? module.efs[0].efs_id : var.modules_info.efs.id
+  vpc_id          = var.modules_info.vpc.create ? module.vpc[0].vpc_id : var.modules_info.vpc.id
+  private_subnets = var.modules_info.vpc.create ? module.vpc[0].private_subnets : var.modules_info.vpc.private_subnets
+  efs_id          = var.modules_info.efs.create ? module.efs[0].efs_id : var.modules_info.efs.id
 }
 
 module "vpc" {
