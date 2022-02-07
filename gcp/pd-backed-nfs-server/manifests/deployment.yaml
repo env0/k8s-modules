@@ -17,7 +17,7 @@ spec:
         topology.kubernetes.io/zone: us-central1-a
       containers:
       - name: nfs-server
-        image: gcr.io/google_containers/volume-nfs:0.8
+        image: ghcr.io/kubernetes-sigs/nfs-ganesha:v3.5
         ports:
           - name: nfs
             containerPort: 2049
