@@ -26,7 +26,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
             - name: SERVICE_NAME
-              value: nfs-provisioner
+              value: env0-nfs-server
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
