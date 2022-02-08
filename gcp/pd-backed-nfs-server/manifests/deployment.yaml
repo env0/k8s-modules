@@ -18,8 +18,6 @@ spec:
       containers:
         - name: nfs-server
           image: ghcr.io/kubernetes-sigs/nfs-ganesha:v3.5
-          args:
-            - "-provisioner=env0-sc-for-nfs-server"
           env:
             - name: POD_IP
               valueFrom:
