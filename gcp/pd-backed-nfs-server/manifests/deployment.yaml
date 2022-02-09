@@ -18,6 +18,8 @@ spec:
       containers:
         - name: nfs-server
           image: k8s.gcr.io/sig-storage/nfs-provisioner:v3.0.0
+          args:
+            - "-provisioner=env0-sc-for-nfs-server"          
           env:
             - name: POD_IP
               valueFrom:
