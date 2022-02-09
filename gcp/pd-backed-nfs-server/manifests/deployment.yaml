@@ -17,7 +17,7 @@ spec:
         topology.kubernetes.io/zone: us-central1-a
       containers:
         - name: nfs-server
-          image: ghcr.io/kubernetes-sigs/nfs-ganesha:v3.5
+          image: k8s.gcr.io/sig-storage/nfs-provisioner:v3.0.0
           env:
             - name: POD_IP
               valueFrom:
