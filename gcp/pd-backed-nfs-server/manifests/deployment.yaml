@@ -90,7 +90,7 @@ spec:
           securityContext:
             privileged: true
           volumeMounts:
-            - mountPath: /data
+            - mountPath: /export
               name: nfs-pvc
           resources:
             limits:
