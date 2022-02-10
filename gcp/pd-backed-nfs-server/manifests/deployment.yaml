@@ -19,10 +19,10 @@ spec:
         - name: nfs-server
           image: ghcr.io/kubernetes-sigs/nfs-ganesha:v3.5
           command
-            - echo "Start rpcbind"
-            - /usr/sbin/rpcbind 127.0.0.1
-            - /usr/sbin/rpc.statd --port 662
-            - dbus-daemon --system --nopidfile
+            - 'echo "Start rpcbind"'
+            - '/usr/sbin/rpcbind 127.0.0.1'
+            - '/usr/sbin/rpc.statd --port 662'
+            - 'dbus-daemon --system --nopidfile'
             - | 
                 printf "
                 ###################################################
@@ -60,7 +60,7 @@ spec:
                 {
                   Grace_Period = 90;
                 }" >> /export/vfs.conf
-            - usr/local/bin/ganesha.nfsd -F -L /export/ganesha.log -p /var/run/ganesha.pid -f /export/vfs.conf
+            - 'usr/local/bin/ganesha.nfsd -F -L /export/ganesha.log -p /var/run/ganesha.pid -f /export/vfs.conf'
           env:
             - name: POD_IP
               valueFrom:
