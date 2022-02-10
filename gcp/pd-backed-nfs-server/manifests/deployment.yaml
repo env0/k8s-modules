@@ -24,7 +24,9 @@ spec:
             - 'echo "Start rpcbind"'
             - '/usr/sbin/rpcbind 127.0.0.1'
             - '/usr/sbin/rpc.statd --port 662'
+            - 'echo "Start dbus"'            
             - 'dbus-daemon --system --nopidfile'
+            - 'echo "Using default config"'            
             - | 
                 printf "
                 ###################################################
@@ -62,6 +64,7 @@ spec:
                 {
                   Grace_Period = 90;
                 }" >> /export/vfs.conf
+            - 'echo "Starting ganesha"'                
             - 'usr/local/bin/ganesha.nfsd -F -L /export/ganesha.log -p /var/run/ganesha.pid -f /export/vfs.conf'
           env:
             - name: POD_IP
