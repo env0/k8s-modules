@@ -51,7 +51,7 @@ spec:
                 # Required for access (default is None)
                 # Could use CLIENT blocks instead
                 Access_Type = RW;
-	              Protocols = 3,4;                
+	        Protocols = 3,4;                
                 # Exporting FSAL
                 FSAL {
                   Name = VFS;
