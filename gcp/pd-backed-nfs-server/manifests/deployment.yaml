@@ -23,6 +23,7 @@ spec:
             - '-c'
             - 'echo "Start rpcbind"'
             - '/usr/sbin/rpcbind 127.0.0.1'
+            - 'echo "Running rpc.statd"'            
             - '/usr/sbin/rpc.statd --port 662'
             - 'echo "Start dbus"'            
             - 'dbus-daemon --system --nopidfile'
