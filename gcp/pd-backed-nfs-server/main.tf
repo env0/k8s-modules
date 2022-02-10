@@ -17,6 +17,14 @@ resource "google_compute_region_disk" "env0_internal_state_disk" {
   replica_zones = [ "us-central1-a", "us-central1-b", ]
 }
 
+resource "helm_release" "nfs_server_provisioner" {
+  depends_on = [module.eks-cluster-autoscaler]
+  name       = "nfs-server-provisioner"
+  repository = "https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/"
+  chart      = "nfs-server-provisioner"
+  timeout    = 600
+}
+
 // K8S Manifests
 # resource "kubernetes_manifest" "nfs_server_deployment" {
 #   depends_on = [
