@@ -30,45 +30,44 @@ spec:
               echo "Start dbus"; \
               dbus-daemon --system --nopidfile; \
               echo "Using default config"; 
-            - | 
-                printf "
-                ###################################################
-                #
-                # EXPORT
-                #
-                # To function, all that is required is an EXPORT
-                #
-                # Define the absolute minimal export
-                #
-                ###################################################
-                EXPORT
-                {
-                  # Export Id (mandatory, each EXPORT must have a unique Export_Id)
-                  Export_Id = 0;
-                  # Exported path (mandatory)
-                  Path = /nonexistent;
-                  # Pseudo Path (required for NFS v4)
-                  Pseudo = /nonexistent;
-                  # Required for access (default is None)
-                  # Could use CLIENT blocks instead
-                  Access_Type = RW;
-                  # Exporting FSAL
-                  FSAL {
-                    Name = VFS;
-                  }
+              printf "
+              ###################################################
+              #
+              # EXPORT
+              #
+              # To function, all that is required is an EXPORT
+              #
+              # Define the absolute minimal export
+              #
+              ###################################################
+              EXPORT
+              {
+                # Export Id (mandatory, each EXPORT must have a unique Export_Id)
+                Export_Id = 0;
+                # Exported path (mandatory)
+                Path = /nonexistent;
+                # Pseudo Path (required for NFS v4)
+                Pseudo = /nonexistent;
+                # Required for access (default is None)
+                # Could use CLIENT blocks instead
+                Access_Type = RW;
+                # Exporting FSAL
+                FSAL {
+                  Name = VFS;
                 }
-                NFS_Core_Param
-                {
-                  MNT_Port = 20048;
-                  NLM_Port = 32803;
-                  fsid_device = true;
-                }
-                NFSV4
-                {
-                  Grace_Period = 90;
-                }" >> /export/vfs.conf
-            - 'echo "Starting ganesha"'                
-            - 'usr/local/bin/ganesha.nfsd -F -L /export/ganesha.log -p /var/run/ganesha.pid -f /export/vfs.conf'
+              }
+              NFS_Core_Param
+              {
+                MNT_Port = 20048;
+                NLM_Port = 32803;
+                fsid_device = true;
+              }
+              NFSV4
+              {
+                Grace_Period = 90;
+              }" >> /export/vfs.conf; \
+              echo "Starting ganesha"; \
+              usr/local/bin/ganesha.nfsd -F -L /export/ganesha.log -p /var/run/ganesha.pid -f /export/vfs.conf;
           env:
             - name: POD_IP
               valueFrom:
