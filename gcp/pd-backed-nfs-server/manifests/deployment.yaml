@@ -18,7 +18,8 @@ spec:
       containers:
         - name: nfs-server
           image: ghcr.io/kubernetes-sigs/nfs-ganesha:v3.5
-          command:
+          command
+            - echo "Start rpcbind"
             - /usr/sbin/rpcbind 127.0.0.1
             - /usr/sbin/rpc.statd --port 662
             - dbus-daemon --system --nopidfile
