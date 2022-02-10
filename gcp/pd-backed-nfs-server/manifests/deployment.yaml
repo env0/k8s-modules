@@ -21,8 +21,7 @@ spec:
           command: ["/bin/sh"]
           args:
             - '-c'
-            - 'echo "Start rpcbind"'
-            - '/usr/sbin/rpcbind 127.0.0.1'
+            - 'echo "Start rpcbind..."; /usr/sbin/rpcbind 127.0.0.1; echo "done";'
             - 'echo "Running rpc.statd"'            
             - '/usr/sbin/rpc.statd --port 662'
             - 'echo "Start dbus"'            
