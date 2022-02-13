@@ -1,0 +1,10 @@
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: "310Gi" # > Needs to be 300Gi
+
+storageClass:
+  defaultClass: true
+  name: env0-state-sc
+  reclaimPolicy: Retain
+  
