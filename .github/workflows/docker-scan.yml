@@ -1,8 +1,6 @@
 name: Docker Image Scan
 
 on:
-  push:
-    branches: '*'
   schedule:
     - cron:  '0 9 * * *'
 
@@ -21,7 +19,7 @@ jobs:
       - name: Scan image
         uses: anchore/scan-action@v3
         with:
-          image: "gcr.io/google-containers/volume-nfs:latest"
+          image: "k8s.gcr.io/sig-storage/nfs-provisioner:v3.0.0"
           fail-build: true
           severity-cutoff: critical
           
@@ -30,5 +28,5 @@ jobs:
         if: failure()
         env:
           SLACK_COLOR: '#FF0000'
-          SLACK_TITLE: 'Found Vulnerabilities in NFS Provisioner Image'
-          SLACK_MESSAGE: ':skull: ${{ env.RESULTS_LINK }} :scream:'
+          SLACK_TITLE: 'Found critical vulnerabilities in NFS Provisioner Image'
+          SLACK_MESSAGE: ':whale: ${{ env.RESULTS_LINK }} :scream:'
