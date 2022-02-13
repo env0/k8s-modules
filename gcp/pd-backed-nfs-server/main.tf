@@ -27,6 +27,6 @@ resource "helm_release" "nfs_server_provisioner" {
   timeout    = 600
 
   values = [
-    "${file("values.yaml")}"
+    "${file("./values.yaml")}"
   ]
 }
