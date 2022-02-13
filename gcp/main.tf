@@ -25,7 +25,18 @@ provider "helm" {
   }
 }
 
-module "pd_backed_nfs_server" {
-  source     = "./pd-backed-nfs-server"
+resource "helm_release" "nfs_server_provisioner" {
+  depends_on = [
+    google_compute_region_disk.env0_internal_state_disk
+  ]
+  name       = "nfs-server-provisioner"
+  repository = "https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/"
+  chart      = "nfs-server-provisioner"
+  timeout    = 600
+
+  force_update = true
+  values = [
+    "${file("${path.module}/values.yaml")}"
+  ]
 }
 

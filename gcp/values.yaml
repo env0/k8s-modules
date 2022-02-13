@@ -1,7 +1,7 @@
 persistence:
   enabled: true
   storageClass: "standard"
-  size: "400Gi"
+  size: "300Gi"
 
 storageClass:
   defaultClass: true
