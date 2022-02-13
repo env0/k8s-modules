@@ -21,7 +21,7 @@ jobs:
       - name: Scan image
         uses: anchore/scan-action@v3
         with:
-          image: "k8s.gcr.io/sig-storage/nfs-provisioner:v3.0.0"
+          image: "gcr.io/google-containers/volume-nfs:latest"
           fail-build: true
           severity-cutoff: critical
           
