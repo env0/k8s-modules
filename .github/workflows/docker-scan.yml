@@ -1,0 +1,32 @@
+name: Docker Image Scan
+
+on:
+  schedule:
+    - cron:  '0 9 * * *'
+
+env:
+  SLACK_WEBHOOK: ${{ secrets.E2E_GITHUB_ACTIONS_SLACK_WEBHOOK }}
+  SLACK_CHANNEL: dev
+  SLACK_USERNAME: e2eBot
+  SLACK_ICON: https://env0-test-result.s3.amazonaws.com/Env0-Color+Icon.png
+  RESULTS_LINK: <https://github.com/env0/k8s-modules/actions/runs/${{ github.run_id }}|results>
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scan image
+        uses: anchore/scan-action@v3
+        with:
+          image: "k8s.gcr.io/sig-storage/nfs-provisioner:v3.0.0"
+          fail-build: true
+          severity-cutoff: critical
+          
+      - name: Failed Slack Notification
+        uses: rtCamp/action-slack-notify@v1.0.0
+        if: failure()
+        env:
+          SLACK_COLOR: '#FF0000'
+          SLACK_TITLE: 'Found Vulnerabilities in NFS Provisioner Image'
+          SLACK_MESSAGE: ':skull: ${{ env.RESULTS_LINK }} :scream:'
