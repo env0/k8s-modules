@@ -1,6 +1,8 @@
 name: Docker Image Scan
 
 on:
+  push:
+    branches: '*'
   schedule:
     - cron:  '0 9 * * *'
 
