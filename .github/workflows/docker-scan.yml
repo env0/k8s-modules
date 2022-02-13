@@ -7,7 +7,7 @@ on:
     - cron:  '0 9 * * *'
 
 env:
-  SLACK_WEBHOOK: ${{ secrets.E2E_GITHUB_ACTIONS_SLACK_WEBHOOK }}
+  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
   SLACK_CHANNEL: dev
   SLACK_USERNAME: e2eBot
   SLACK_ICON: https://env0-test-result.s3.amazonaws.com/Env0-Color+Icon.png
