@@ -26,6 +26,7 @@ resource "helm_release" "nfs_server_provisioner" {
   chart      = "nfs-server-provisioner"
   timeout    = 600
 
+  force_update = true
   values = [
     "${file("${path.module}/values.yaml")}"
   ]
