@@ -7,3 +7,4 @@ storageClass:
   defaultClass: true
   name: env0-state-sc
   reclaimPolicy: Retain
+  
