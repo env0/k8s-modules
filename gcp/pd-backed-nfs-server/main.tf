@@ -25,14 +25,8 @@ resource "helm_release" "nfs_server_provisioner" {
   repository = "https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/"
   chart      = "nfs-server-provisioner"
   timeout    = 600
+
+  values = [
+    "${file("values.yaml")}"
+  ]
 }
-
-// K8S Manifests
-# resource "kubernetes_manifest" "nfs_server_deployment" {
-#   depends_on = [
-#     google_compute_region_disk.env0_internal_state_disk
-#   ]
-#   for_each = toset(local.manifests)
-#   manifest = yamldecode(file("${path.module}/manifests/${each.value}.yaml"))
-# }
-

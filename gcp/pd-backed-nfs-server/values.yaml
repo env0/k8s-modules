@@ -1,0 +1,7 @@
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: 200Gi
+
+storageClass:
+  defaultClass: true
