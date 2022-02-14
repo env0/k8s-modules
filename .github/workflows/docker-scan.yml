@@ -7,7 +7,7 @@ on:
 env:
   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
   SLACK_CHANNEL: dev
-  SLACK_USERNAME: e2eBot
+  SLACK_USERNAME: securityBot
   SLACK_ICON: https://env0-test-result.s3.amazonaws.com/Env0-Color+Icon.png
   RESULTS_LINK: <https://github.com/env0/k8s-modules/actions/runs/${{ github.run_id }}|results>
 
