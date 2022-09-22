@@ -26,7 +26,7 @@ module "eks-cluster-autoscaler" {
   cluster_identity_oidc_issuer_arn = module.oidc-provider-data.arn
 
 
-  helm_chart_version = "9.9.2"
+  helm_chart_version = "9.21.0"
 
   values = yamlencode({
     # Determined by our cluster version -
