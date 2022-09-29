@@ -19,14 +19,14 @@ module "oidc-provider-data" {
 
 module "eks-cluster-autoscaler" {
   source  = "lablabs/eks-cluster-autoscaler/aws"
-  version = "1.6.1"
+  version = "1.6.2"
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
   cluster_identity_oidc_issuer_arn = module.oidc-provider-data.arn
 
 
-  helm_chart_version = "9.9.2"
+  helm_chart_version = "9.21.0"
 
   values = yamlencode({
     # Determined by our cluster version -
