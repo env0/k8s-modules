@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     aws        = "~> 3.68.0"
-    kubernetes = "~> 2.14.0"
+    kubernetes = "=> 2.9.0"
     helm       = "~> 2.7.0"
     kubectl = {
       source  = "gavinbunney/kubectl"
