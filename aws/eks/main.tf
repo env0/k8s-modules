@@ -38,8 +38,12 @@ module "eks" {
     }
   }
 
-  manage_aws_auth = var.manage_aws_auth
+  manage_aws_auth = local.aws_auth
   map_roles    = var.map_roles
   map_users    = []
   map_accounts = []
+}
+
+locals {
+  aws_auth = length(var.map_roles) > 0 ? true: false
 }
