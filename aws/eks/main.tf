@@ -38,6 +38,7 @@ module "eks" {
     }
   }
 
+  manage_aws_auth = var.manage_aws_auth
   map_roles    = var.map_roles
   map_users    = []
   map_accounts = []
