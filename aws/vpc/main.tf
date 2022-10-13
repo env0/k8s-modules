@@ -23,7 +23,10 @@ module "vpc" {
   }
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 locals {
-  // zones supported by our kind of machine type in our region
-  aws_availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
+  aws_availability_zones = data.aws_availability_zones.available.names
 }
