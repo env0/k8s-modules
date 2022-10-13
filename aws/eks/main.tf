@@ -38,6 +38,8 @@ module "eks" {
     }
   }
 
+  write_kubeconfig = var.write_kubeconfig
+
   map_roles    = var.map_roles
   map_users    = []
   map_accounts = []
