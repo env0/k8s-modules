@@ -4,7 +4,7 @@ module "vpc" {
 
   name                 = "vpc-${var.cluster_name}"
   cidr                 = var.cidr
-  azs                  = local.aws_availability_zones
+  azs                  = data.aws_ec2_instance_type_offerings.example.locations
   private_subnets      = var.private_subnets
   public_subnets       = var.public_subnets
   enable_nat_gateway   = true
@@ -23,10 +23,11 @@ module "vpc" {
   }
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
+data "aws_ec2_instance_type_offerings" "supported_azs" {
+  filter {
+    name   = "instance-type"
+    values = [var.instance_type]
+  }
 
-locals {
-  aws_availability_zones = data.aws_availability_zones.available.names
+  location_type = "availability-zone"
 }
