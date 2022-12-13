@@ -4,7 +4,7 @@ module "vpc" {
 
   name                 = "vpc-${var.cluster_name}"
   cidr                 = var.cidr
-  azs                  = local.aws_availability_zones
+  azs                  = data.aws_ec2_instance_type_offerings.example.locations
   private_subnets      = var.private_subnets
   public_subnets       = var.public_subnets
   enable_nat_gateway   = true
@@ -23,7 +23,11 @@ module "vpc" {
   }
 }
 
-locals {
-  // zones supported by our kind of machine type in our region
-  aws_availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d", "us-east-1f"]
+data "aws_ec2_instance_type_offerings" "supported_azs" {
+  filter {
+    name   = "instance-type"
+    values = [var.instance_type]
+  }
+
+  location_type = "availability-zone"
 }

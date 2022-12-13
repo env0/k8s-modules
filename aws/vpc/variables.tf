@@ -17,3 +17,8 @@ variable "public_subnets" {
 
   default = ["172.16.8.0/22", "172.16.24.0/22", "172.16.40.0/22", "172.16.56.0/22", "172.16.72.0/22"]
 }
+
+variable "instance_type" {
+  description = "Instance type the EKS cluster is using. Needs to match aws/eks/variables.tf instance_type. Used to check which AZs support this instance type."
+  default = "t3a.2xlarge" 
+}
