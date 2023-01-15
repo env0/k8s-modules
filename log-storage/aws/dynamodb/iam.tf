@@ -39,6 +39,13 @@ resource "aws_iam_role" "log_reader" {
           Effect   = "Allow"
           Resource = aws_dynamodb_table.deployment_logs_table.arn
         },
+        {
+          Action   = [
+            "dynamodb:DescribeTable", "dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem", "dynamodb:BatchGetItem"
+          ]
+          Effect   = "Allow"
+          Resource = aws_dynamodb_table.deployment_remote_run_logs_table.arn
+        },
       ]
     })
   }
@@ -72,6 +79,21 @@ resource "aws_iam_role" "log_writer" {
           ]
           Effect   = "Allow"
           Resource = aws_dynamodb_table.deployment_logs_table.arn
+        },
+        {
+          Action   = [
+            "dynamodb:DescribeTable",
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:BatchGetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem",
+            "dynamodb:BatchWriteItem"
+          ]
+          Effect   = "Allow"
+          Resource = aws_dynamodb_table.deployment_remote_run_logs_table.arn
         },
       ]
     })
