@@ -22,3 +22,28 @@ resource "aws_dynamodb_table" "deployment_logs_table" {
     prevent_destroy = true
   }
 }
+
+resource "aws_dynamodb_table" "deployment_remote_run_logs_table" {
+  name = "deployment-step-service-${var.env0_stage}-remote-run-logs-${var.agent_key}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "deploymentLogId"
+  range_key    = "offsetStart"
+
+  attribute {
+    name = "deploymentLogId"
+    type = "S"
+  }
+
+  attribute {
+    name = "offsetStart"
+    type = "N"
+  }
+
+  point_in_time_recovery {
+    enabled = true
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
