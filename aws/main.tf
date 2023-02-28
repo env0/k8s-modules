@@ -19,11 +19,27 @@ module "vpc" {
   public_subnets  = var.public_subnets
 }
 
+data "aws_eks_cluster" "eks" {
+  name = module.eks.cluster_id
+}
+
+data "aws_eks_cluster_auth" "eks" {
+  name = module.eks.cluster_id
+}
+
+provider "kubernetes" {
+  alias = "k8s"
+  host                   = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.eks.token
+}
+
 module "eks" {
   depends_on = [module.vpc]
-  count         = var.modules_info.eks.create ? 1 : 0
   source     = "./eks"
-
+  providers = {
+    kubernetes = kubernetes.k8s
+  }
   vpc_id        = local.vpc_id
   cluster_name  = var.cluster_name
   map_roles     = var.map_roles
