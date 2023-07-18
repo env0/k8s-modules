@@ -19,7 +19,7 @@ module "oidc-provider-data" {
 
 module "eks-cluster-autoscaler" {
   source  = "lablabs/eks-cluster-autoscaler/aws"
-  version = "2.1.0"
+  version = "1.6.1"
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
