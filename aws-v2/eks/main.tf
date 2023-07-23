@@ -1,0 +1,71 @@
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+
+  tags = {
+    tier = "private"
+  }
+}
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 1.5"
+}
+
+module "eks" {
+  source          = "terraform-aws-modules/eks/aws"
+  version         = "19.15.3"
+  cluster_name    = var.cluster_name
+  cluster_version = "1.27"
+  subnet_ids     = data.aws_subnets.private.ids
+  enable_irsa     = true
+  vpc_id          = var.vpc_id
+
+  create_kms_key = false
+  enable_kms_key_rotation = false
+
+  cluster_enabled_log_types = ["api", "scheduler", "controllerManager"] # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+
+  eks_managed_node_group_defaults  = {
+    ami_type  = "AL2_x86_64"
+    disk_size = 50
+  }
+
+  eks_managed_node_groups = {
+    deployment = {
+      name             = "${var.cluster_name}-deployment"
+      desired_size = var.min_capacity
+      max_size     = 50
+      min_size     = var.min_capacity
+
+      instance_types = [var.instance_type]
+      capacity_type  = "SPOT"
+    }
+  }
+
+    cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+  }
+
+  cluster_encryption_config = {}
+
+  # write_kubeconfig = var.write_kubeconfig
+  manage_aws_auth_configmap = true
+  aws_auth_roles = var.aws_auth_roles
+  aws_auth_accounts = []
+  aws_auth_users = []
+
+  #map_roles    = var.map_roles
+  #map_users    = []
+  #map_accounts = []
+}
