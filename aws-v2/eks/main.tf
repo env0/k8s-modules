@@ -9,10 +9,6 @@ data "aws_subnets" "private" {
   }
 }
 
-module "kms" {
-  source  = "terraform-aws-modules/kms/aws"
-  version = "~> 1.5"
-}
 
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
@@ -67,14 +63,9 @@ module "eks" {
 
   cluster_encryption_config = {}
 
-  # write_kubeconfig = var.write_kubeconfig
-  #create_aws_auth_configmap = true
   manage_aws_auth_configmap = true
   aws_auth_roles = var.aws_auth_roles
   aws_auth_accounts = []
   aws_auth_users = []
 
-  #map_roles    = var.map_roles
-  #map_users    = []
-  #map_accounts = []
 }
