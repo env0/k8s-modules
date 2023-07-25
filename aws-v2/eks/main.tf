@@ -28,6 +28,8 @@ module "eks" {
 
   cluster_enabled_log_types = ["api", "scheduler", "controllerManager"] # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
 
+  cluster_endpoint_public_access = true
+
   eks_managed_node_group_defaults  = {
     ami_type  = "AL2_x86_64"
     disk_size = 50
@@ -47,7 +49,13 @@ module "eks" {
 
     cluster_addons = {
     coredns = {
+      preserve    = true
       most_recent = true
+
+      timeouts = {
+        create = "25m"
+        delete = "10m"
+      }
     }
     kube-proxy = {
       most_recent = true
@@ -60,6 +68,7 @@ module "eks" {
   cluster_encryption_config = {}
 
   # write_kubeconfig = var.write_kubeconfig
+  #create_aws_auth_configmap = true
   manage_aws_auth_configmap = true
   aws_auth_roles = var.aws_auth_roles
   aws_auth_accounts = []

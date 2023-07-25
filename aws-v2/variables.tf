@@ -41,6 +41,9 @@ variable "instance_type" {
   default = "t3a.2xlarge" # 8vCPUs 32GB
 }
 
+variable "region" {
+  default = "us-east-1"
+}
 # variable "write_kubeconfig" {
 #   type = bool
 #   default = false 
