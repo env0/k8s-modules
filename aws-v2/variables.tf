@@ -8,13 +8,13 @@ variable "cidr" {
 variable "private_subnets" {
   description = "List of private subnets inside the VPC"
 
-  default = ["172.17.0.0/21", "172.17.16.0/21", "172.17.32.0/21", "172.17.48.0/21", "172.17.64.0/21"]
+  default = ["172.16.0.0/21", "172.16.16.0/21", "172.16.32.0/21", "172.16.48.0/21", "172.16.64.0/21"]
 }
 
 variable "public_subnets" {
   description = "List of public subnets inside the VPC"
 
-  default = ["172.17.8.0/22", "172.17.24.0/22", "172.17.40.0/22", "172.17.56.0/22", "172.17.72.0/22"]
+  default = ["172.16.8.0/22", "172.16.24.0/22", "172.16.40.0/22", "172.16.56.0/22", "172.16.72.0/22"]
 }
 
 variable "cluster_name" {

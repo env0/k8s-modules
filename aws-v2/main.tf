@@ -63,16 +63,16 @@ module "eks" {
   instance_type = var.instance_type
 }
 
-# module "efs" {
-#   count        = var.modules_info.efs.create ? 1 : 0
-#   depends_on   = [module.eks, module.vpc]
-#   source       = "../aws/efs"
+module "efs" {
+  count        = var.modules_info.efs.create ? 1 : 0
+  depends_on   = [module.eks, module.vpc]
+  source       = "../aws/efs"
 
-#   region       = var.region
-#   vpc_id       = local.vpc_id
-#   cluster_name = var.cluster_name
-#   subnets      = local.private_subnets
-# }
+  region       = var.region
+  vpc_id       = local.vpc_id
+  cluster_name = var.cluster_name
+  subnets      = local.private_subnets
+}
 
 # module "autoscaler" {
 #   count      = var.modules_info.autoscaler.create ? 1 : 0
