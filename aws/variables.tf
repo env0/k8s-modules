@@ -5,13 +5,13 @@ variable "cidr" {
   default = "172.16.0.0/16"
 }
 
-variable "private_subnets" {
+variable "private_subnets_cidr_blocks" {
   description = "List of private subnets inside the VPC"
 
   default = ["172.16.0.0/21", "172.16.16.0/21", "172.16.32.0/21", "172.16.48.0/21", "172.16.64.0/21"]
 }
 
-variable "public_subnets" {
+variable "public_subnets_cidr_blocks" {
   description = "List of public subnets inside the VPC"
 
   default = ["172.16.8.0/22", "172.16.24.0/22", "172.16.40.0/22", "172.16.56.0/22", "172.16.72.0/22"]
@@ -29,7 +29,14 @@ variable "aws_auth_roles" {
     groups   = list(string)
   }))
 
-  default = []
+  # TODO: remove this deafult value before merge
+  default = [
+    {
+      "rolearn": "arn:aws:iam::343806850935:role/AWSReservedSSO_AdministratorAccess_9999c6a81f899fc6",
+      "groups": ["system:masters"],
+      "username": "anv0 kushield admin"
+    }
+]
 }
 
 variable "min_capacity" {
@@ -89,7 +96,7 @@ variable "modules_info" {
     vpc = object({
       create = bool
       id = string
-      private_subnets = list(string)
+      private_subnets_cidr_blocks = list(string)
     })
     eks = object({
       create = bool
@@ -111,11 +118,11 @@ variable "modules_info" {
     vpc = {
       create = true
       id = ""
-      private_subnets = []
+      private_subnets_cidr_blocks = [] #["172.16.0.0/21", "172.16.16.0/21", "172.16.32.0/21", "172.16.48.0/21", "172.16.64.0/21"]
     }
     eks = {
       create = true
-      cluster_id = ""
+      cluster_id = "liran-demo"
     }
     efs = {
       create = true
@@ -130,7 +137,7 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(!var.modules_info.vpc.create && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets) == 0))
+    condition = !(!var.modules_info.vpc.create && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets_cidr_blocks) == 0))
     error_message = "You must specify vpc_id and private_subnets if you don't want the vpc to be created."
   }
 

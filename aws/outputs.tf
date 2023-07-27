@@ -1,5 +1,5 @@
-output "kubernetes_host" {
-  value       = module.eks.cluster_endpoint #,data.aws_eks_cluster.my_eks.endpoint)
+output "cluster_endpoint" {
+  value       =  local.cluster_endpoint #? module.eks[0].cluster_endpoint : data.aws_eks_cluster.my_eks[0].endpoint
   description = "EKS cluster host endpoint"
 }
 
