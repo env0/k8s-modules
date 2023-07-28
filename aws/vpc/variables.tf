@@ -19,6 +19,11 @@ variable "public_subnets" {
 }
 
 variable "instance_type" {
-  description = "Instance type the EKS cluster is using. Needs to match aws/eks/variables.tf instance_type. Used to check which AZs support this instance type."
+  description = <<-EOT
+  Instance type the EKS cluster is using.
+  Needs to match aws/eks/variables.tf instance_type.
+  Used to check which AZs support this instance type.
+  Notice that it will force recreation of the VPC
+  EOT
   default = "t3a.2xlarge" 
 }

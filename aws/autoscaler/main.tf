@@ -19,7 +19,7 @@ module "oidc-provider-data" {
 
 module "eks-cluster-autoscaler" {
   source  = "lablabs/eks-cluster-autoscaler/aws"
-  version = "1.6.2"
+  version = "2.1.0"
 
   cluster_name                     = var.cluster_name
   cluster_identity_oidc_issuer     = local.cluster_oidc_issuer_url
@@ -33,7 +33,9 @@ module "eks-cluster-autoscaler" {
     # Open the Cluster Autoscaler releases page from GitHub in a web browser and find the latest Cluster Autoscaler version that matches the Kubernetes major and minor version of your cluster.
     # For example, if the Kubernetes version of your cluster is 1.20, find the latest Cluster Autoscaler release that begins with 1.20.
     "image" : {
-      "tag" : "v${data.aws_eks_cluster.cluster.version}.0"
+      "tag" : "v${data.aws_eks_cluster.cluster.version}.3",
+      "repository" : "registry.k8s.io/autoscaling/cluster-autoscaler"
+
     }
     # Here you we can further configure the autoscaler:
     # https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml#L131

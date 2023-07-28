@@ -14,6 +14,9 @@ module "efs" {
   subnets = var.subnets
 
   transition_to_ia    = ["AFTER_7_DAYS"]
+  
+  enabled = true
+  efs_backup_policy_enabled = true
 
   // NOTE: the module is stupid and puts this tag on the security group and access point as well
   tags = {
@@ -31,12 +34,4 @@ module "efs" {
       description              = "Allow ingress traffic to EFS from primary EKS security group"
     }
   ]
-}
-
-resource "aws_efs_backup_policy" "policy" {
-  file_system_id = module.efs.id
-
-  backup_policy {
-    status = "ENABLED"
-  }
 }
