@@ -77,20 +77,6 @@ variable "reclaim_policy" {
   default = "Retain"
 }
 
-
-variable "map_roles" {
-  description = "Additional IAM roles to add to the aws-auth configmap."
-
-  type = list(object({
-    rolearn  = string
-    username = string
-    groups   = list(string)
-  }))
-
-  default = []
-}
-
-
 variable "modules_info" {
   type = object({
     vpc = object({

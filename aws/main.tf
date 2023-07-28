@@ -25,9 +25,6 @@ data "aws_eks_cluster" "my_eks" {
   name  = var.modules_info.eks.cluster_id
 }
 
-# TODO 
-# figure out why the CSI driver fails to deploy
-
 module "vpc" {
   count  = var.modules_info.vpc.create ? 1 : 0
   source = "./vpc"
@@ -39,7 +36,6 @@ module "vpc" {
 }
 
 provider "kubernetes" {
-  #depends_on = [module.eks]
   host                   = local.cluster_endpoint
   cluster_ca_certificate = base64decode(local.cluster_certificate_authority_data)
   # TODO try data.aws_eks_cluster_auth.cluster.token
