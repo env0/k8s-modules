@@ -1,6 +1,5 @@
 locals {
   vpc_id = var.modules_info.vpc.create ? module.vpc[0].vpc_id : var.modules_info.vpc.id
-  #private_subnets = var.modules_info.vpc.create ? module.vpc[0].private_subnets_cidr_blocks : var.modules_info.vpc.private_subnets_cidr_blocks
   efs_id                             = var.modules_info.efs.create ? module.efs.efs_id : var.modules_info.efs.id
   cluster_certificate_authority_data = var.modules_info.eks.create ? module.eks[0].cluster_certificate_authority_data : data.aws_eks_cluster.my_eks[0].certificate_authority[0].data
   cluster_endpoint                   = var.modules_info.eks.create ? module.eks[0].cluster_endpoint : data.aws_eks_cluster.my_eks[0].endpoint
@@ -68,7 +67,6 @@ module "efs" {
 }
 
 module "csi_driver" {
-  #count      = var.modules_info.csi_driver.create ? 1 : 0
   depends_on = [module.eks]
   source = "./csi-driver"
 

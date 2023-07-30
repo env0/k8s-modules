@@ -1,5 +1,5 @@
 output "cluster_endpoint" {
-  value       =  try(local.cluster_endpoint, null) #? module.eks[0].cluster_endpoint : data.aws_eks_cluster.my_eks[0].endpoint
+  value       =  try(local.cluster_endpoint, null)
   description = "EKS cluster host endpoint"
 }
 
