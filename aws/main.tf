@@ -7,7 +7,6 @@ locals {
   private_subnets_ids                = var.modules_info.vpc.create ? module.vpc[0].private_subnets : data.aws_subnets.private[0].ids
 }
 
-#TODO figure out why the data 
 data "aws_subnets" "private" {
   count = var.modules_info.vpc.create ? 0 : 1
   filter {
@@ -33,34 +32,6 @@ module "vpc" {
   cidr            = var.cidr
   private_subnets = var.private_subnets_cidr_blocks
   public_subnets  = var.public_subnets_cidr_blocks
-}
-
-provider "kubernetes" {
-  host                   = local.cluster_endpoint
-  cluster_ca_certificate = base64decode(local.cluster_certificate_authority_data)
-  # TODO try data.aws_eks_cluster_auth.cluster.token
-  exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
-    command     = "aws"
-    # This requires the awscli to be installed locally where Terraform is executed
-    args = ["eks", "get-token", "--cluster-name", var.cluster_name]
-  }
-}
-
-
-provider "helm" {
-  kubernetes {
-    #depends_on = [module.eks]
-    host                   = local.cluster_endpoint
-    cluster_ca_certificate = base64decode(local.cluster_certificate_authority_data)
-    # TODO try data.aws_eks_cluster_auth.cluster.token
-    exec {
-      api_version = "client.authentication.k8s.io/v1beta1"
-      command     = "aws"
-      # This requires the awscli to be installed locally where Terraform is executed
-      args = ["eks", "get-token", "--cluster-name", var.cluster_name]
-    }
-  }
 }
 
 module "eks" {
@@ -98,7 +69,7 @@ module "efs" {
 
 module "csi_driver" {
   #count      = var.modules_info.csi_driver.create ? 1 : 0
-  #depends_on = [module.efs]
+  depends_on = [module.eks]
   source = "./csi-driver"
 
   efs_id         = module.efs.efs_id
