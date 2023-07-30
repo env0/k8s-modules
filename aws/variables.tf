@@ -53,19 +53,11 @@ variable "region" {
 }
 
 
-# existing modules variables
-
 ## VPC
 variable vpc_id {
   description = "the vpc id"
   default = ""
 }
-
-# variable vpc_private_subnets {
-#   description = "the vpc private subnets"
-#   default = ""
-# }
-
 
 ## EFS
 variable efs_id {
@@ -108,7 +100,7 @@ variable "modules_info" {
     }
     eks = {
       create = true
-      cluster_id = "liran-demo"
+      cluster_id = ""
     }
     efs = {
       create = true
