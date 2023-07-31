@@ -13,7 +13,7 @@ module "efs" {
   enabled                   = true
   efs_backup_policy_enabled = true
   
-  allowed_security_group_ids = flatten(var.allowed_security_group_ids)
+  allowed_security_group_ids = var.allowed_security_group_ids
 
   // NOTE: the module is stupid and puts this tag on the security group and access point as well
   tags = {

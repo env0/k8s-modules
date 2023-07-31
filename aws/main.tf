@@ -6,25 +6,7 @@ locals {
   private_subnets_ids                = module.vpc[0].private_subnets
 }
 
-data "aws_subnets" "private" {
-  count = var.modules_info.vpc.create ? 0 : 1
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
-
-  tags = {
-    tier = "private"
-  }
-}
-
-data "aws_eks_cluster" "my_eks" {
-  count = var.modules_info.eks.create ? 0 : 1
-  name  = var.modules_info.eks.cluster_id
-}
-
 module "vpc" {
-  count  = var.modules_info.vpc.create ? 1 : 0
   source = "./vpc"
 
   cluster_name    = var.cluster_name
@@ -34,7 +16,6 @@ module "vpc" {
 }
 
 module "eks" {
-  count  = var.modules_info.eks.create ? 1 : 0
   source = "./eks"
 
   vpc_id         = local.vpc_id
@@ -46,7 +27,6 @@ module "eks" {
 
 
 module "autoscaler" {
-  count      = var.modules_info.autoscaler.create ? 1 : 0
   depends_on = [module.eks]
   source     = "./autoscaler"
 
@@ -54,7 +34,6 @@ module "autoscaler" {
 }
 
 module "efs" {
-  #count        = var.modules_info.efs.create ? 1 : 0
   depends_on = [module.eks, module.vpc]
   source     = "./efs"
 
