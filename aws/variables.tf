@@ -18,7 +18,7 @@ variable "public_subnets_cidr_blocks" {
 }
 
 variable "cluster_name" {
-    default = "liran-demo"
+  default = "liran-demo"
 }
 
 variable "aws_auth_roles" {
@@ -32,16 +32,16 @@ variable "aws_auth_roles" {
   # TODO: remove this deafult value before merge
   default = [
     {
-      "rolearn": "arn:aws:iam::343806850935:role/AWSReservedSSO_AdministratorAccess_9999c6a81f899fc6",
-      "groups": ["system:masters"],
-      "username": "anv0 kushield admin"
+      "rolearn" : "arn:aws:iam::343806850935:role/AWSReservedSSO_AdministratorAccess_9999c6a81f899fc6",
+      "groups" : ["system:masters"],
+      "username" : "anv0 kushield admin"
     }
-]
+  ]
 }
 
 variable "min_capacity" {
   description = "Min number of workers"
-  default = 2
+  default     = 2
 }
 
 variable "instance_type" {
@@ -54,15 +54,15 @@ variable "region" {
 
 
 ## VPC
-variable vpc_id {
+variable "vpc_id" {
   description = "the vpc id"
-  default = ""
+  default     = ""
 }
 
 ## EFS
-variable efs_id {
+variable "efs_id" {
   description = "the efs id"
-  default = ""
+  default     = ""
 }
 
 variable "reclaim_policy" {
@@ -72,19 +72,19 @@ variable "reclaim_policy" {
 variable "modules_info" {
   type = object({
     vpc = object({
-      create = bool
-      id = string
+      create                      = bool
+      id                          = string
       private_subnets_cidr_blocks = list(string)
     })
     eks = object({
-      create = bool
+      create     = bool
       cluster_id = string
     })
-    efs = object ({
+    efs = object({
       create = bool
-      id = string
+      id     = string
     })
-    autoscaler = object ({
+    autoscaler = object({
       create = bool
     })
     csi_driver = object({
@@ -94,17 +94,17 @@ variable "modules_info" {
 
   default = {
     vpc = {
-      create = true
-      id = ""
-      private_subnets_cidr_blocks = [] #["172.16.0.0/21", "172.16.16.0/21", "172.16.32.0/21", "172.16.48.0/21", "172.16.64.0/21"]
+      create                      = true
+      id                          = ""
+      private_subnets_cidr_blocks = []
     }
     eks = {
-      create = true
+      create     = true
       cluster_id = ""
     }
     efs = {
       create = true
-      id = ""
+      id     = ""
     }
     autoscaler = {
       create = true
@@ -115,32 +115,32 @@ variable "modules_info" {
   }
 
   validation {
-    condition = !(!var.modules_info.vpc.create && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets_cidr_blocks) == 0))
+    condition     = !(!var.modules_info.vpc.create && (var.modules_info.vpc.id == "" || length(var.modules_info.vpc.private_subnets_cidr_blocks) == 0))
     error_message = "You must specify vpc_id and private_subnets if you don't want the vpc to be created."
   }
 
   validation {
-    condition = !(!var.modules_info.eks.create && var.modules_info.eks.cluster_id == "")
+    condition     = !(!var.modules_info.eks.create && var.modules_info.eks.cluster_id == "")
     error_message = "You must specify cluster_id if you don't want the eks to be created."
   }
 
   validation {
-    condition = !(!var.modules_info.eks.create && var.modules_info.vpc.create)
+    condition     = !(!var.modules_info.eks.create && var.modules_info.vpc.create)
     error_message = "You can't provision eks without vpc."
   }
 
   validation {
-    condition = !(!var.modules_info.efs.create && var.modules_info.efs.create)
+    condition     = !(!var.modules_info.efs.create && var.modules_info.efs.create)
     error_message = "You can't proviosn efs without eks."
   }
 
   validation {
-    condition = !(!var.modules_info.autoscaler.create && var.modules_info.eks.create)
+    condition     = !(!var.modules_info.autoscaler.create && var.modules_info.eks.create)
     error_message = "You can't proviosn autoscaler without eks."
   }
 
   validation {
-    condition = !(!var.modules_info.csi_driver.create && var.modules_info.efs.create)
+    condition     = !(!var.modules_info.csi_driver.create && var.modules_info.efs.create)
     error_message = "You can't proviosn csi_driver without efs."
   }
 }

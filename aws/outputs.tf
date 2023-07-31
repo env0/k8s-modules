@@ -1,5 +1,5 @@
 output "cluster_endpoint" {
-  value       =  try(local.cluster_endpoint, null)
+  value       = try(local.cluster_endpoint, null)
   description = "EKS cluster host endpoint"
 }
 

@@ -1,5 +1,5 @@
 locals {
-  vpc_id = var.modules_info.vpc.create ? module.vpc[0].vpc_id : var.modules_info.vpc.id
+  vpc_id                             = var.modules_info.vpc.create ? module.vpc[0].vpc_id : var.modules_info.vpc.id
   efs_id                             = var.modules_info.efs.create ? module.efs.efs_id : var.modules_info.efs.id
   cluster_certificate_authority_data = var.modules_info.eks.create ? module.eks[0].cluster_certificate_authority_data : data.aws_eks_cluster.my_eks[0].certificate_authority[0].data
   cluster_endpoint                   = var.modules_info.eks.create ? module.eks[0].cluster_endpoint : data.aws_eks_cluster.my_eks[0].endpoint
@@ -66,7 +66,7 @@ module "efs" {
 
 module "csi_driver" {
   depends_on = [module.eks]
-  source = "./csi-driver"
+  source     = "./csi-driver"
 
   efs_id         = module.efs.efs_id
   reclaim_policy = var.reclaim_policy

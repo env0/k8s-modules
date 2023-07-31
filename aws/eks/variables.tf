@@ -6,7 +6,7 @@ variable "vpc_id" {
 
 variable "min_capacity" {
   description = "Min number of workers"
-  default = 2
+  default     = 2
 }
 
 variable "instance_type" {
@@ -14,8 +14,8 @@ variable "instance_type" {
 }
 
 variable "write_kubeconfig" {
-  type = bool
-  default = false 
+  type    = bool
+  default = false
 }
 
 variable "aws_auth_roles" {
@@ -29,9 +29,9 @@ variable "aws_auth_roles" {
   # TODO: remove this deafult value before merge
   default = [
     {
-      "rolearn": "arn:aws:iam::343806850935:role/AWSReservedSSO_AdministratorAccess_9999c6a81f899fc6",
-      "groups": ["system:masters"],
-      "username": "anv0 kushield admin"
+      "rolearn" : "arn:aws:iam::343806850935:role/AWSReservedSSO_AdministratorAccess_9999c6a81f899fc6",
+      "groups" : ["system:masters"],
+      "username" : "anv0 kushield admin"
     }
-]
+  ]
 }

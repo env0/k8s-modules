@@ -14,7 +14,6 @@ module "vpc" {
   public_subnet_tags = {
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                    = "1"
-    "tier" = "public"
   }
 
   private_subnet_tags = {

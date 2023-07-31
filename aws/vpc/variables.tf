@@ -25,5 +25,5 @@ variable "instance_type" {
   Used to check which AZs support this instance type.
   Notice that it will force recreation of the VPC
   EOT
-  default = "t3a.2xlarge" 
+  default     = "t3a.2xlarge"
 }
