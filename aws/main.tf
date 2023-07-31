@@ -53,8 +53,6 @@ module "autoscaler" {
   cluster_name = var.cluster_name
 }
 
-
-# EFS and CSI driver should be deployed together
 module "efs" {
   #count        = var.modules_info.efs.create ? 1 : 0
   depends_on = [module.eks, module.vpc]
