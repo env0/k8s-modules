@@ -31,7 +31,6 @@ module "eks" {
     disk_size = 50
   }
 
-  # TODO figure out why the name is different
   eks_managed_node_groups = {
     deployment = {
       use_name_prefix = false
@@ -42,7 +41,6 @@ module "eks" {
 
       instance_types = [var.instance_type]
       capacity_type  = "SPOT"
-      #use_custom_launch_template = false
 
     }
   }

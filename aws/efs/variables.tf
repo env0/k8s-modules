@@ -7,3 +7,7 @@ variable "vpc_id" {
 }
 
 variable "subnets" {}
+
+variable "allowed_security_group_ids" {
+  default = []
+}
