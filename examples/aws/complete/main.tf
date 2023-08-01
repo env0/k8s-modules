@@ -41,7 +41,7 @@ provider "helm" {
 }
 
 
-module "agent_cluster" {
+module "k8s_cluster" {
   source       = "../../../aws"
   cluster_name = local.cluster_name
   aws_auth_roles = var.aws_auth_roles
