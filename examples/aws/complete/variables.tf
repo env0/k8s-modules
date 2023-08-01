@@ -6,3 +6,9 @@ variable "create" {
 variable "aws_auth_roles" {
   default = []
 }
+
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "cluster_name" {}
