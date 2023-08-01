@@ -1,9 +1,9 @@
 locals {
-  vpc_id                             = module.vpc[0].vpc_id 
+  vpc_id                             = module.vpc.vpc_id 
   efs_id                             = module.efs.efs_id
-  cluster_certificate_authority_data = module.eks[0].cluster_certificate_authority_data
-  cluster_endpoint                   = module.eks[0].cluster_endpoint
-  private_subnets_ids                = module.vpc[0].private_subnets
+  cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
+  cluster_endpoint                   = module.eks.cluster_endpoint
+  private_subnets_ids                = module.vpc.private_subnets
 }
 
 module "vpc" {
@@ -41,7 +41,7 @@ module "efs" {
   vpc_id       = local.vpc_id
   cluster_name = var.cluster_name
   subnets      = local.private_subnets_ids
-  allowed_security_group_ids = [module.eks[0].node_security_group_id,module.eks[0].cluster_security_group_id] 
+  allowed_security_group_ids = [module.eks.node_security_group_id,module.eks.cluster_security_group_id] 
 }
 
 module "csi_driver" {
