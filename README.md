@@ -47,7 +47,7 @@ provider "helm" {
 }
 ```
 #### Creating a full-blown cluster installation
-If you'd like to create a cluster from scratch, including a VPC and an EFS for storage, you can simply use the `aws` root folder as a module
+If you'd like to create a cluster from scratch, including a VPC and an EFS for storage, you can simply use the `aws` root folder as a module. Also checkout the `examples` directory
 ```terraform
 // cluster.tf
 module "my-cluster" {
