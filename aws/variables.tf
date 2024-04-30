@@ -1,3 +1,9 @@
+## VPC
+variable "azs" {
+  description = "A list of availability zones names or ids in the region"
+  type        = list(string)
+  default     = []
+}
 
 variable "cidr" {
   description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
@@ -18,7 +24,6 @@ variable "public_subnets_cidr_blocks" {
 }
 
 variable "cluster_name" {
-  default = "liran-demo"
 }
 
 variable "aws_auth_roles" {
@@ -43,13 +48,6 @@ variable "instance_type" {
 
 variable "region" {
   default = "us-east-1"
-}
-
-
-## VPC
-variable "vpc_id" {
-  description = "the vpc id"
-  default     = ""
 }
 
 ## EFS
