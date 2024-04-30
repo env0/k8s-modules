@@ -3,7 +3,6 @@ locals {
   efs_id                             = module.efs.efs_id
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
   cluster_endpoint                   = module.eks.cluster_endpoint
-  private_subnets_ids                = module.vpc.private_subnets
 }
 
 module "vpc" {
@@ -20,11 +19,15 @@ module "vpc" {
 module "eks" {
   source = "./eks"
 
-  vpc_id         = local.vpc_id
   cluster_name   = var.cluster_name
-  aws_auth_roles = var.aws_auth_roles
+
+  vpc_id         = local.vpc_id
+  subnet_ids     = module.vpc.private_subnet_ids
+
   min_capacity   = var.min_capacity
   instance_type  = var.instance_type
+
+  aws_auth_roles = var.aws_auth_roles
 }
 
 
@@ -45,7 +48,7 @@ module "efs" {
   region                     = var.region
   vpc_id                     = local.vpc_id
   cluster_name               = var.cluster_name
-  subnets                    = local.private_subnets_ids
+  subnets                    = module.vpc.private_subnet_ids
   allowed_security_group_ids = [module.eks.node_security_group_id, module.eks.cluster_security_group_id]
 }
 

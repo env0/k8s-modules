@@ -1,14 +1,3 @@
-data "aws_subnets" "private" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
-
-  tags = {
-    tier = "private"
-  }
-}
-
 locals {
   managed_node_group_name = "${var.cluster_name}-deployment"
 }
@@ -23,7 +12,7 @@ module "eks" {
   enable_irsa     = true
 
   vpc_id          = var.vpc_id
-  subnet_ids      = data.aws_subnets.private.ids
+  subnet_ids      = var.subnet_ids
 
 
   # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
