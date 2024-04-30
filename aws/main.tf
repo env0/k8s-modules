@@ -19,13 +19,13 @@ module "vpc" {
 module "eks" {
   source = "./eks"
 
-  cluster_name   = var.cluster_name
+  cluster_name = var.cluster_name
 
-  vpc_id         = local.vpc_id
-  subnet_ids     = module.vpc.private_subnet_ids
+  vpc_id     = local.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
 
-  min_capacity   = var.min_capacity
-  instance_type  = var.instance_type
+  min_capacity  = var.min_capacity
+  instance_type = var.instance_type
 
   aws_auth_roles = var.aws_auth_roles
 }
@@ -54,9 +54,11 @@ module "efs" {
 
 module "csi_driver" {
   depends_on = [module.eks]
-  source     = "./csi-driver"
+  source     = "./efs-csi-driver"
 
-  efs_id         = module.efs.efs_id
-  reclaim_policy = var.reclaim_policy
-  cluster_name   = var.cluster_name
+  efs_id            = module.efs.efs_id
+  reclaim_policy    = var.reclaim_policy
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
 }
