@@ -11,8 +11,8 @@ module "vpc" {
 
   cluster_name = var.cluster_name
 
-  azs  = var.azs
-  cidr = var.cidr
+  azs                         = var.azs
+  cidr                        = var.cidr
   private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
   public_subnets_cidr_blocks  = var.public_subnets_cidr_blocks
 }
@@ -32,7 +32,10 @@ module "autoscaler" {
   depends_on = [module.eks]
   source     = "./autoscaler"
 
-  cluster_name = var.cluster_name
+  cluster_name            = var.cluster_name
+  managed_node_group_name = module.eks.managed_node_group_name
+  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  oidc_provider_arn       = module.eks.oidc_provider_arn
 }
 
 module "efs" {

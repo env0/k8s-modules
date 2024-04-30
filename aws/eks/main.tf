@@ -9,6 +9,9 @@ data "aws_subnets" "private" {
   }
 }
 
+locals {
+  managed_node_group_name = "${var.cluster_name}-deployment"
+}
 
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
@@ -36,7 +39,7 @@ module "eks" {
   eks_managed_node_groups = {
     deployment = {
       use_name_prefix = false
-      name            = "${var.cluster_name}-deployment"
+      name            = local.managed_node_group_name
       desired_size    = var.min_capacity
       max_size        = 50
       min_size        = var.min_capacity
