@@ -1,6 +1,6 @@
 data "aws_eks_node_group" "node_group" {
   cluster_name    = var.cluster_name
-  node_group_name = "${var.cluster_name}-deployment"
+  node_group_name = var.managed_node_group_name
 }
 
 locals {
