@@ -26,8 +26,6 @@ module "eks" {
 
   min_capacity  = var.min_capacity
   instance_type = var.instance_type
-
-  aws_auth_roles = var.aws_auth_roles
 }
 
  module "auth_config" {
