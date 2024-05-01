@@ -14,6 +14,6 @@ module "efs" {
 
   enabled                   = true
   efs_backup_policy_enabled = true
-  
+
   allowed_security_group_ids = var.allowed_security_group_ids
 }

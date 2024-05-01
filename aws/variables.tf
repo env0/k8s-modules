@@ -23,8 +23,7 @@ variable "public_subnets_cidr_blocks" {
   default = ["172.16.8.0/22", "172.16.24.0/22", "172.16.40.0/22", "172.16.56.0/22", "172.16.72.0/22"]
 }
 
-variable "cluster_name" {
-}
+variable "cluster_name" {}
 
 variable "kubernetes_version" {
   default = "1.29"
@@ -33,7 +32,8 @@ variable "kubernetes_version" {
 variable "cluster_access_entries" {
   description = "Map of access entries to add to the cluster"
   type        = any
-  default     = {}
+
+  default = {}
 }
 
 variable "min_capacity" {

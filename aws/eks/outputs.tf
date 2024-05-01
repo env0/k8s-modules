@@ -14,7 +14,7 @@ output "cluster_certificate_authority_data" {
 }
 
 output "node_security_group_id" {
-  value = module.eks.node_security_group_id
+  value       = module.eks.node_security_group_id
   description = "ID of the node shared security group"
 }
 

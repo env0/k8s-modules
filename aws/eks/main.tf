@@ -15,7 +15,7 @@ module "eks" {
 
   access_entries = var.cluster_access_entries
 
-  vpc_id = var.vpc_id
+  vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
 
 
@@ -67,7 +67,7 @@ module "eks" {
     }
   }
 
-  create_kms_key          = false
-  enable_kms_key_rotation = false
+  create_kms_key            = false
+  enable_kms_key_rotation   = false
   cluster_encryption_config = {}
 }

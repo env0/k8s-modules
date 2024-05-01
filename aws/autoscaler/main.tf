@@ -23,8 +23,8 @@ module "eks-cluster-autoscaler" {
   source  = "lablabs/eks-cluster-autoscaler/aws"
   version = "2.2.0"
 
-  cluster_name                 = var.cluster_name
-  cluster_identity_oidc_issuer = var.cluster_oidc_issuer_url
+  cluster_name                     = var.cluster_name
+  cluster_identity_oidc_issuer     = var.cluster_oidc_issuer_url
   cluster_identity_oidc_issuer_arn = var.oidc_provider_arn
 
   # make sure that chart version matches the cluster version

@@ -57,8 +57,8 @@ module "efs_csi_driver" {
   depends_on = [module.eks]
   source     = "./efs-csi-driver"
 
-  efs_id            = module.efs.efs_id
-  reclaim_policy    = var.reclaim_policy
+  efs_id         = module.efs.efs_id
+  reclaim_policy = var.reclaim_policy
 
   cluster_name      = var.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
