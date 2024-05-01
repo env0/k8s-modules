@@ -11,6 +11,8 @@ module "eks" {
 
   enable_irsa = true
 
+  enable_cluster_creator_admin_permissions = true
+
   vpc_id = var.vpc_id
   subnet_ids = var.subnet_ids
 
@@ -27,14 +29,14 @@ module "eks" {
 
   eks_managed_node_groups = {
     deployment = {
-      version         = var.kubernetes_version
+      version = var.kubernetes_version
 
       name            = local.managed_node_group_name
       use_name_prefix = false
 
-      min_size        = var.min_capacity
-      desired_size    = var.min_capacity
-      max_size        = 50
+      min_size     = var.min_capacity
+      desired_size = var.min_capacity
+      max_size     = 50
 
       update_config = {
         max_unavailable_percentage = 50
