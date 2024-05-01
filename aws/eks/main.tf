@@ -36,6 +36,10 @@ module "eks" {
       desired_size    = var.min_capacity
       max_size        = 50
 
+      update_config = {
+        max_unavailable_percentage = 50
+      }
+
       instance_types = [var.instance_type]
       capacity_type  = "SPOT"
     }
@@ -62,5 +66,4 @@ module "eks" {
   create_kms_key          = false
   enable_kms_key_rotation = false
   cluster_encryption_config = {}
-
 }
