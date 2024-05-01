@@ -54,7 +54,7 @@ module "efs" {
   allowed_security_group_ids = [module.eks.node_security_group_id, module.eks.cluster_security_group_id]
 }
 
-module "csi_driver" {
+module "efs_csi_driver" {
   depends_on = [module.eks]
   source     = "./efs-csi-driver"
 

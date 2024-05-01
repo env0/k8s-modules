@@ -1,9 +1,11 @@
 module "efs" {
 
   source  = "cloudposse/efs/aws"
-  version = "0.34.0"
+  version = "~> 1.1"
 
   region = var.region
+
+  name = "${var.cluster_name}-state-efs"
 
   vpc_id  = var.vpc_id
   subnets = var.subnets
@@ -14,9 +16,4 @@ module "efs" {
   efs_backup_policy_enabled = true
   
   allowed_security_group_ids = var.allowed_security_group_ids
-
-  // NOTE: the module is stupid and puts this tag on the security group and access point as well
-  tags = {
-    Name = "${var.cluster_name}-state-efs"
-  }
 }
