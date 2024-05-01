@@ -60,8 +60,14 @@ module "eks" {
   enable_kms_key_rotation = false
   cluster_encryption_config = {}
 
+}
+
+module "auth_config" {
+  source          = "terraform-aws-modules/eks/aws//modules/aws-auth"
+  version         = "~> 20.8"
+
   manage_aws_auth_configmap = true
   aws_auth_roles            = var.aws_auth_roles
-  aws_auth_accounts         = []
   aws_auth_users            = []
+  aws_auth_accounts         = []
 }
