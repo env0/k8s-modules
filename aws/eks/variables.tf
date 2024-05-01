@@ -1,7 +1,6 @@
 variable "cluster_name" {}
 
-variable "kubernetes_version" {
-}
+variable "kubernetes_version" {}
 
 variable "vpc_id" {
   description = "The id of the specific VPC to using"
