@@ -8,14 +8,14 @@ locals {
   role_name            = "${var.cluster_name}_AmazonEKS_EFS_CSI_DriverRole"
 }
 
-module "external_dns_role" {
+module "efs_csi_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.39"
 
   create_role = true
   role_name   = local.role_name
 
-  attach_external_dns_policy = true
+  attach_efs_csi_policy = true
 
   oidc_providers = {
     external_dns = {
