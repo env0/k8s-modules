@@ -30,6 +30,10 @@ module "eks" {
   aws_auth_roles = var.aws_auth_roles
 }
 
+ module "auth_config" {
+  source = "./auth-config"
+  aws_auth_roles = var.aws_auth_roles
+}
 
 module "autoscaler" {
   depends_on = [module.eks]
