@@ -13,6 +13,8 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
+  access_entries = var.cluster_access_entries
+
   vpc_id = var.vpc_id
   subnet_ids = var.subnet_ids
 

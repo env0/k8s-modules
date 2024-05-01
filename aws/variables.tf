@@ -30,15 +30,10 @@ variable "kubernetes_version" {
   default = "1.29"
 }
 
-variable "aws_auth_roles" {
-  description = "Additional IAM roles to add to the aws-auth configmap."
-  type = list(object({
-    rolearn  = string
-    username = string
-    groups   = list(string)
-  }))
-
-  #default = []
+variable "cluster_access_entries" {
+  description = "Map of access entries to add to the cluster"
+  type        = any
+  default     = {}
 }
 
 variable "min_capacity" {

@@ -19,3 +19,5 @@ variable "min_capacity" {
 variable "instance_type" {
   default = "t3a.2xlarge" # 8vCPUs 32GB
 }
+
+variable "cluster_access_entries" {}

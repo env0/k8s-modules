@@ -28,11 +28,8 @@ module "eks" {
 
   min_capacity  = var.min_capacity
   instance_type = var.instance_type
-}
 
- module "auth_config" {
-  source = "./auth-config"
-  aws_auth_roles = var.aws_auth_roles
+  cluster_access_entries = var.cluster_access_entries
 }
 
 module "autoscaler" {
