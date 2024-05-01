@@ -3,16 +3,16 @@ locals {
 }
 
 module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  version         = "~> 20.8"
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.8"
 
   cluster_name    = var.cluster_name
-  cluster_version = "1.27"
+  cluster_version = var.kubernetes_version
 
-  enable_irsa     = true
+  enable_irsa = true
 
-  vpc_id          = var.vpc_id
-  subnet_ids      = var.subnet_ids
+  vpc_id = var.vpc_id
+  subnet_ids = var.subnet_ids
 
 
   # https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
@@ -27,11 +27,14 @@ module "eks" {
 
   eks_managed_node_groups = {
     deployment = {
-      use_name_prefix = false
+      version         = var.kubernetes_version
+
       name            = local.managed_node_group_name
+      use_name_prefix = false
+
+      min_size        = var.min_capacity
       desired_size    = var.min_capacity
       max_size        = 50
-      min_size        = var.min_capacity
 
       instance_types = [var.instance_type]
       capacity_type  = "SPOT"

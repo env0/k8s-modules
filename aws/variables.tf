@@ -26,6 +26,10 @@ variable "public_subnets_cidr_blocks" {
 variable "cluster_name" {
 }
 
+variable "kubernetes_version" {
+  default = "1.29"
+}
+
 variable "aws_auth_roles" {
   description = "Additional IAM roles to add to the aws-auth configmap."
   type = list(object({
