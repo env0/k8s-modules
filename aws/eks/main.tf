@@ -1,5 +1,5 @@
 locals {
-  managed_node_group_name = "${var.cluster_name}-deployment"
+  managed_node_group_name = "deployment"
 }
 
 module "eks" {
