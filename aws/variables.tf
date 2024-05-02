@@ -58,3 +58,9 @@ variable "efs_id" {
 variable "reclaim_policy" {
   default = "Retain"
 }
+
+variable "enable_calico" {
+  description = "Enable Calico for network policy enforcement"
+  default     = false
+  type        = bool
+}

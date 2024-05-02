@@ -22,7 +22,7 @@ module "efs_csi_role" {
 
   oidc_providers = {
     external_dns = {
-      provider_arn               = var.oidc_provider_arn
+      provider_arn = var.oidc_provider_arn
       namespace_service_accounts = [
         "${local.namespace}:${local.controller_service_account_name}",
         "${local.namespace}:${local.node_service_account_name}"

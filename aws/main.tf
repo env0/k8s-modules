@@ -63,3 +63,10 @@ module "efs_csi_driver" {
   cluster_name      = var.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
 }
+
+module "calico" {
+  depends_on = [module.eks]
+  source     = "./calico"
+
+  count = var.enable_calico ? 1 : 0
+}
