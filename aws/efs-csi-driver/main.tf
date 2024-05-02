@@ -3,9 +3,10 @@ data "aws_eks_cluster" "cluster" {
 }
 
 locals {
-  namespace            = "kube-system"
-  service_account_name = "efs-csi-controller-sa"
-  role_name            = "${var.cluster_name}_AmazonEKS_EFS_CSI_DriverRole"
+  namespace                       = "kube-system"
+  controller_service_account_name = "efs-csi-controller-sa"
+  node_service_account_name       = "efs-csi-node-sa"
+  role_name                       = "${var.cluster_name}_AmazonEKS_EFS_CSI_DriverRole"
 }
 
 module "efs_csi_role" {
@@ -15,12 +16,17 @@ module "efs_csi_role" {
   create_role = true
   role_name   = local.role_name
 
-  attach_efs_csi_policy = true
+  role_policy_arns = {
+    "AmazonEKS_CSI_EFS_Policy" = "arn:aws:iam::aws:policy/AmazonEKS_CSI_EFS_Policy"
+  }
 
   oidc_providers = {
     external_dns = {
       provider_arn               = var.oidc_provider_arn
-      namespace_service_accounts = ["${local.namespace}:${local.service_account_name}"]
+      namespace_service_accounts = [
+        "${local.namespace}:${local.controller_service_account_name}",
+        "${local.namespace}:${local.node_service_account_name}"
+      ]
     }
   }
 }
@@ -29,26 +35,27 @@ resource "helm_release" "kubernetes_efs_csi_driver" {
   name       = "aws-efs-csi-driver"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   chart      = "aws-efs-csi-driver"
-  namespace  = local.namespace
-  timeout    = 600
+  version    = "3.0.3"
 
-  set {
-    name  = "controller.serviceAccount.create"
-    value = "true"
-    type  = "string"
-  }
+  namespace = local.namespace
+  timeout   = 600
 
-  set {
-    name  = "controller.serviceAccount.name"
-    value = local.service_account_name
-    type  = "string"
-  }
-
-  set {
-    name  = "image.repository"
-    value = "602401143452.dkr.ecr.us-east-1.amazonaws.com/eks/aws-efs-csi-driver"
-    type  = "string"
-  }
+  values = [
+    yamlencode({
+      controller = {
+        serviceAccount = {
+          create = true
+          name   = local.controller_service_account_name
+        }
+      }
+      node = {
+        serviceAccount = {
+          create = true
+          name   = local.node_service_account_name
+        }
+      }
+    })
+  ]
 }
 
 resource "kubernetes_storage_class" "storage_class" {
