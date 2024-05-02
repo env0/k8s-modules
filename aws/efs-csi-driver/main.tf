@@ -17,7 +17,7 @@ module "efs_csi_role" {
   role_name   = local.role_name
 
   role_policy_arns = {
-    "AmazonEKS_CSI_EFS_Policy" = "arn:aws:iam::aws:policy/AmazonEKS_CSI_EFS_Policy"
+    "AmazonEKS_CSI_EFS_Policy" = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
   }
 
   oidc_providers = {
