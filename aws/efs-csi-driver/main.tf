@@ -46,12 +46,18 @@ resource "helm_release" "kubernetes_efs_csi_driver" {
         serviceAccount = {
           create = true
           name   = local.controller_service_account_name
+          annotations = {
+            "eks.amazonaws.com/role-arn" = module.efs_csi_role.iam_role_arn
+          }
         }
       }
       node = {
         serviceAccount = {
           create = true
           name   = local.node_service_account_name
+          annotations = {
+            "eks.amazonaws.com/role-arn" = module.efs_csi_role.iam_role_arn
+          }
         }
       }
     })
