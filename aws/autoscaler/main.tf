@@ -32,8 +32,7 @@ module "eks-cluster-autoscaler" {
 
   values = yamlencode({
     # Here you we can further configure the autoscaler:
-    # https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml#L131
-    # We should do so after reviewing https://docs.aws.amazon.com/eks/latest/userguide/cluster-autoscaler.html#ca-deployment-considerations
+    # https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml
     # extraArgs: {
     #  scale-down-utilization-threshold: local.single_deployment_pod_utilization_of_node_resources
     #}
