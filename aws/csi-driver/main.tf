@@ -1,7 +1,3 @@
-data "aws_eks_cluster" "cluster" {
-  name = var.cluster_name
-}
-
 locals {
   namespace                       = "kube-system"
   controller_service_account_name = "efs-csi-controller-sa"
