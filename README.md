@@ -24,7 +24,7 @@ For example, only create a EFS CSI driver for storage:
 ```terraform
 // csi-driver.tf
 module "csi-driver" {
-  source = "github.com/env0/k8s-modules//aws/efs-csi-driver"
+  source = "github.com/env0/k8s-modules//aws/csi-driver"
 
   cluster_name = "eks_corporation_prod"
   efs_id = var.efs_id
