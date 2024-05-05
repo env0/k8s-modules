@@ -7,6 +7,3 @@ output "cluster_endpoint" {
 output "cluster_certificate_authority_data" {
   value = try(local.cluster_certificate_authority_data, null)
 }
-
-
-
