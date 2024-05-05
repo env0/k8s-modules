@@ -50,11 +50,6 @@ variable "region" {
 }
 
 ## EFS
-variable "efs_id" {
-  description = "the efs id"
-  default     = ""
-}
-
 variable "reclaim_policy" {
   default = "Retain"
 }

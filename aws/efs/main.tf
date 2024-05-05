@@ -17,3 +17,11 @@ module "efs" {
 
   allowed_security_group_ids = var.allowed_security_group_ids
 }
+
+resource "aws_efs_backup_policy" "policy" {
+  file_system_id = module.efs.id
+
+  backup_policy {
+    status = "ENABLED"
+  }
+}
