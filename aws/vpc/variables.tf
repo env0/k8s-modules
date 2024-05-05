@@ -6,7 +6,7 @@ variable "azs" {
 }
 
 variable "cidr" {
-  description = "The CIDR block for the VPC. Default value is a valid CIDR, but not acceptable by AWS and should be overridden"
+  description = "The CIDR block for the VPC"
 }
 
 variable "private_subnets_cidr_blocks" {
