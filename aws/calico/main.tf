@@ -8,4 +8,9 @@ resource "helm_release" "calico" {
   create_namespace = true
 
   timeout = 600
+
+  set {
+    name = "apiServer.enabled"
+    value = "false"
+  }
 }
