@@ -5,49 +5,8 @@ you can take those examples and use them as-is or fork the repo and adjust for y
 You can, of course, mix and match according to your own needs.
 
 ### AWS 
-#### Setting up providers 
-in case you mix and match modules - check the versions.tf of those modules to know which providers are needed
-```terraform
-// providers.tf
-provider "aws" {
-  region = var.region
-}
-
-data "aws_eks_cluster" "cluster" {
-  name = module.my-cluster.cluster_id
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.my-cluster.cluster_id
-}
-
-provider "kubernetes" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-}
-
-provider "kubectl" {
-  host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.cluster.token
-  load_config_file       = false
-}
-
-provider "helm" {
-  kubernetes {
-    host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-    exec {
-      api_version = "client.authentication.k8s.io/v1alpha1"
-      args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
-      command     = "aws"
-    }
-  }
-}
-```
 #### Creating a full-blown cluster installation
-If you'd like to create a cluster from scratch, including a VPC and an EFS for storage, you can simply use the `aws` root folder as a module
+If you'd like to create a cluster from scratch, including a VPC and an EFS for storage, you can simply use the `aws` root folder as a module.
 ```terraform
 // cluster.tf
 module "my-cluster" {
@@ -59,16 +18,19 @@ module "my-cluster" {
 ``` 
 #### Partial installation
 You can also just pick out the parts necessary for your installation.
-For example, only create a CSI-driver for storage:
+Check the `versions.tf` of submodule to know which providers are needed, check the `providers.tf` file of the root module to know how to configure them.
+ 
+For example, only create a EFS CSI driver for storage:
 ```terraform
 // csi-driver.tf
 module "csi-driver" {
   source = "github.com/env0/k8s-modules//aws/csi-driver"
 
-  cluster_name = 'eks_corporation_prod'
+  cluster_name = "eks_corporation_prod"
   efs_id = var.efs_id
 }
 ```
+
 #### Alternative Log Storage
 You can store the deployment logs on your own cloud provider, for supported cloud providers. See `log-storage/README.md` for more details
 ### Installing the env0 agent

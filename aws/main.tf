@@ -1,61 +1,72 @@
-data aws_eks_cluster "my_eks" {
-  count = var.modules_info.eks.create ? 0 : 1
-  name = var.modules_info.eks.cluster_id
-}
-
 locals {
-  vpc_id          = var.modules_info.vpc.create ? module.vpc[0].vpc_id : var.modules_info.vpc.id
-  private_subnets = var.modules_info.vpc.create ? module.vpc[0].private_subnets : var.modules_info.vpc.private_subnets
-  efs_id          = var.modules_info.efs.create ? module.efs[0].efs_id : var.modules_info.efs.id
+  vpc_id                             = module.vpc.vpc_id
+  efs_id                             = module.efs.efs_id
+  cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
+  cluster_endpoint                   = module.eks.cluster_endpoint
 }
 
 module "vpc" {
-  count           = var.modules_info.vpc.create ? 1 : 0
-  source          = "./vpc"
+  source = "./vpc"
 
-  cluster_name    = var.cluster_name
-  cidr            = var.cidr
-  private_subnets = var.private_subnets
-  public_subnets  = var.public_subnets
+  cluster_name = var.cluster_name
+
+  azs                         = var.azs
+  cidr                        = var.cidr
+  private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
+  public_subnets_cidr_blocks  = var.public_subnets_cidr_blocks
 }
 
 module "eks" {
-  depends_on = [module.vpc]
-  count         = var.modules_info.eks.create ? 1 : 0
-  source     = "./eks"
+  source = "./eks"
 
-  vpc_id        = local.vpc_id
-  cluster_name  = var.cluster_name
-  map_roles     = var.map_roles
+  cluster_name = var.cluster_name
+
+  kubernetes_version = var.kubernetes_version
+
+  vpc_id     = local.vpc_id
+  subnet_ids = module.vpc.private_subnet_ids
+
   min_capacity  = var.min_capacity
   instance_type = var.instance_type
-}
 
-module "efs" {
-  count        = var.modules_info.efs.create ? 1 : 0
-  depends_on   = [module.eks, module.vpc]
-  source       = "./efs"
-
-  region       = var.region
-  vpc_id       = local.vpc_id
-  cluster_name = var.cluster_name
-  subnets      = local.private_subnets
+  cluster_access_entries = var.cluster_access_entries
 }
 
 module "autoscaler" {
-  count      = var.modules_info.autoscaler.create ? 1 : 0
   depends_on = [module.eks]
   source     = "./autoscaler"
 
-  cluster_name = var.cluster_name
+  cluster_name            = var.cluster_name
+  managed_node_group_name = module.eks.managed_node_group_name
+  cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
+  oidc_provider_arn       = module.eks.oidc_provider_arn
 }
 
-module "csi_driver" {
-  count      = var.modules_info.csi_driver.create ? 1 : 0
-  depends_on = [module.efs]
+module "efs" {
+  depends_on = [module.eks, module.vpc]
+  source     = "./efs"
+
+  region                     = var.region
+  vpc_id                     = local.vpc_id
+  cluster_name               = var.cluster_name
+  subnets                    = module.vpc.private_subnet_ids
+  allowed_security_group_ids = [module.eks.node_security_group_id, module.eks.cluster_security_group_id]
+}
+
+module "efs_csi_driver" {
+  depends_on = [module.eks]
   source     = "./csi-driver"
 
-  efs_id         = local.efs_id
+  efs_id         = module.efs.efs_id
   reclaim_policy = var.reclaim_policy
-  cluster_name   = var.cluster_name
+
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+}
+
+module "calico" {
+  depends_on = [module.eks]
+  source     = "./calico"
+
+  count = var.enable_calico ? 1 : 0
 }
