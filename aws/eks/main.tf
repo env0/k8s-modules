@@ -54,8 +54,8 @@ module "eks" {
         max_unavailable_percentage = 50
       }
 
-      instance_types = [var.instance_type]
-      capacity_type  = "SPOT"
+      instance_types = var.instance_types
+      capacity_type  = var.capacity_type
     }
   }
 
