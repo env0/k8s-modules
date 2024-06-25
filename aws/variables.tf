@@ -1,8 +1,8 @@
 ## VPC
 variable "azs" {
   description = "A list of availability zones names or ids in the region"
-  type        = list(string)
-  default     = []
+  type = list(string)
+  default = []
 }
 
 variable "cidr" {
@@ -41,8 +41,18 @@ variable "min_capacity" {
   default     = 2
 }
 
-variable "instance_type" {
-  default = "t3a.2xlarge" # 8vCPUs 32GB
+variable "instance_types" {
+  default = [
+    "t3a.2xlarge",
+    "t3a.xlarge",
+    "t3.2xlarge",
+    "t3.xlarge"
+  ]
+  type = list(string)
+}
+
+variable "capacity_type" {
+  default = "SPOT"
 }
 
 variable "region" {

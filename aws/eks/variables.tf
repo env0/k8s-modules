@@ -16,8 +16,18 @@ variable "min_capacity" {
   default     = 2
 }
 
-variable "instance_type" {
-  default = "t3a.2xlarge" # 8vCPUs 32GB
+variable "instance_types" {
+  default = [
+    "t3a.2xlarge",
+    "t3a.xlarge",
+    "t3.2xlarge",
+    "t3.xlarge"
+  ]
+  type = list(string)
+}
+
+variable "capacity_type" {
+  default = "SPOT"
 }
 
 variable "cluster_access_entries" {}
