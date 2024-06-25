@@ -27,7 +27,7 @@ module "eks" {
   subnet_ids = module.vpc.private_subnet_ids
 
   min_capacity  = var.min_capacity
-  instance_type = var.instance_types
+  instance_types = var.instance_types
   capacity_type = var.capacity_type
 
   cluster_access_entries = var.cluster_access_entries
