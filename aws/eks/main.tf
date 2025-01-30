@@ -25,7 +25,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   eks_managed_node_group_defaults = {
-    ami_type  = "AL2_x86_64"
+    ami_type = "AL2_x86_64"
 
     block_device_mappings = {
       xvda = {
@@ -61,8 +61,8 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      version    = "v1.11.1-eksbuild.9"
-      preserve    = true
+      version  = "v1.11.3-eksbuild.1"
+      preserve = true
 
       timeouts = {
         create = "25m"
@@ -70,10 +70,10 @@ module "eks" {
       }
     }
     kube-proxy = {
-      version = "v1.29.3-eksbuild.5"
+      version = "v1.31.2-eksbuild.3"
     }
     vpc-cni = {
-      version = "v1.18.2-eksbuild.1"
+      version = "v1.19.0-eksbuild.1"
     }
   }
 

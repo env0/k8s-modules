@@ -1,8 +1,8 @@
 ## VPC
 variable "azs" {
   description = "A list of availability zones names or ids in the region"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "cidr" {
@@ -26,7 +26,7 @@ variable "public_subnets_cidr_blocks" {
 variable "cluster_name" {}
 
 variable "kubernetes_version" {
-  default = "1.29"
+  default = "1.31"
 }
 
 variable "cluster_access_entries" {
