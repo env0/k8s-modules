@@ -25,9 +25,7 @@ variable "public_subnets_cidr_blocks" {
 
 variable "cluster_name" {}
 
-variable "kubernetes_version" {
-  default = "1.31"
-}
+variable "kubernetes_version" {}
 
 variable "cluster_access_entries" {
   description = "Map of access entries to add to the cluster"
