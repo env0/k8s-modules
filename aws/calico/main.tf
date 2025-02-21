@@ -18,7 +18,7 @@ resource "helm_release" "calico" {
           }
         },
           var.calico_docker_hub_credentials != null ? {
-          imagePullSecrets = {
+          imagePullSecrets = jsonencode({
             auths = {
               "docker.io" = {
                 username = var.calico_docker_hub_credentials.username,
@@ -27,7 +27,7 @@ resource "helm_release" "calico" {
                 auth     = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
               }
             }
-          }
+          })
         } : {}
       )
     )
