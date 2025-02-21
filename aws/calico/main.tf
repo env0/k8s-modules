@@ -1,17 +1,3 @@
-locals {
-  docker_config = var.calico_docker_hub_credentials != null ? {
-    auths = {
-      "docker.io" = {
-        username = var.calico_docker_hub_credentials.username
-        password = var.calico_docker_hub_credentials.password
-        email    = var.calico_docker_hub_credentials.email
-        auth = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
-      }
-    }
-  } : null
-}
-
-
 resource "helm_release" "calico" {
   repository = "https://docs.projectcalico.org/charts/"
   chart      = "tigera-operator"
@@ -23,17 +9,27 @@ resource "helm_release" "calico" {
 
   timeout = 600
 
-  set {
-    name = "apiServer.enabled"
-    value = "false"
-  }
-
-  dynamic "set_sensitive" {
-    for_each = local.docker_config != null ? [jsonencode({ "calico-image-pull-secret": local.docker_config })] : []
-    iterator = config
-    content {
-      name  = "imagePullSecrets"
-      value = config.value
-    }
-  }
+  values = [
+    yamlencode(
+      merge(
+        {
+          apiServer = {
+            enabled = false
+          }
+        },
+          var.calico_docker_hub_credentials != null ? {
+          imagePullSecrets = {
+            auths = {
+              "docker.io" = {
+                username = var.calico_docker_hub_credentials.username,
+                password = var.calico_docker_hub_credentials.password,
+                email    = var.calico_docker_hub_credentials.email,
+                auth     = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
+              }
+            }
+          }
+        } : {}
+      )
+    )
+  ]
 }
