@@ -16,25 +16,28 @@ resource "helm_release" "calico" {
 
   dynamic "set" {
     for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
+    iterator = cred
     content {
       name  = "imagePullSecrets[0].username"
-      value = set.value.username
+      value = cred.value.username
     }
   }
 
   dynamic "set_sensitive" {
     for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
+    iterator = cred
     content {
       name  = "imagePullSecrets[0].password"
-      value = set.value.password
+      value = cred.value.password
     }
   }
 
   dynamic "set" {
     for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
+    iterator = cred
     content {
       name  = "imagePullSecrets[0].email"
-      value = set.value.email
+      value = cred.value.email
     }
   }
 
