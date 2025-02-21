@@ -33,7 +33,7 @@ resource "helm_release" "calico" {
     iterator = config
     content {
       name  = "imagePullSecrets"
-      value = config.value
+      value = "\"${config.value}\""
     }
   }
 }
