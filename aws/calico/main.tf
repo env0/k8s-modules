@@ -29,7 +29,7 @@ resource "helm_release" "calico" {
   }
 
   dynamic "set_sensitive" {
-    for_each = local.docker_config != null ? [base64encode(jsonencode(local.docker_config))] : []
+    for_each = local.docker_config != null ? [jsonencode(local.docker_config)] : []
     iterator = config
     content {
       name  = "imagePullSecrets"
