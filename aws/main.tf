@@ -69,5 +69,5 @@ module "calico" {
   source = "./calico"
 
   count = var.enable_calico ? 1 : 0
-  calico_image_pull_secret = var.calico_image_pull_secret
+  calico_docker_hub_credentials = var.calico_docker_hub_credentials
 }

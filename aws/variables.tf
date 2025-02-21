@@ -68,8 +68,13 @@ variable "enable_calico" {
   type        = bool
 }
 
-variable "calico_image_pull_secret" {
-  description = "The image pull secret for Calico"
+variable "calico_docker_hub_credentials" {
+  description = "Docker Hub credentials"
+  type = object({
+    username = string
+    password = string
+    email    = string
+  })
   default = null
-  type = map(string)
+  sensitive = true
 }
