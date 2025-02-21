@@ -18,16 +18,18 @@ resource "helm_release" "calico" {
           }
         },
           var.calico_docker_hub_credentials != null ? {
-          imagePullSecrets = jsonencode({
-            auths = {
-              "docker.io" = {
-                username = var.calico_docker_hub_credentials.username,
-                password = var.calico_docker_hub_credentials.password,
-                email    = var.calico_docker_hub_credentials.email,
-                auth     = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
+          imagePullSecrets = {
+            "calico-image-pull-secret": jsonencode({
+              auths = {
+                "docker.io" = {
+                  username = var.calico_docker_hub_credentials.username,
+                  password = var.calico_docker_hub_credentials.password,
+                  email    = var.calico_docker_hub_credentials.email,
+                  auth     = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
+                }
               }
-            }
-          })
+            })
+          }
         } : {}
       )
     )
