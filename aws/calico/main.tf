@@ -13,4 +13,11 @@ resource "helm_release" "calico" {
     name = "apiServer.enabled"
     value = "false"
   }
+
+  set {
+    name = "imagePullSecrets"
+    value = jsonencode({
+      "calico-image-pull-secret" = var.calico_image_pull_secret
+    })
+  }
 }
