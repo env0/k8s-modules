@@ -1,3 +1,17 @@
+locals {
+  docker_config = var.calico_docker_hub_credentials != null ? {
+    auths = {
+      "docker.io" = {
+        username = var.calico_docker_hub_credentials.username
+        password = var.calico_docker_hub_credentials.password
+        email    = var.calico_docker_hub_credentials.email
+        auth = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
+      }
+    }
+  } : null
+}
+
+
 resource "helm_release" "calico" {
   repository = "https://docs.projectcalico.org/charts/"
   chart      = "tigera-operator"
@@ -14,31 +28,12 @@ resource "helm_release" "calico" {
     value = "false"
   }
 
-  dynamic "set" {
-    for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
-    iterator = cred
-    content {
-      name  = "imagePullSecrets[0].username"
-      value = cred.value.username
-    }
-  }
-
   dynamic "set_sensitive" {
-    for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
-    iterator = cred
+    for_each = local.docker_config != null ? [base64encode(jsonencode(local.docker_config))] : []
+    iterator = config
     content {
-      name  = "imagePullSecrets[0].password"
-      value = cred.value.password
+      name  = "imagePullSecrets"
+      value = config.value
     }
   }
-
-  dynamic "set" {
-    for_each = var.calico_docker_hub_credentials != null ? [var.calico_docker_hub_credentials] : []
-    iterator = cred
-    content {
-      name  = "imagePullSecrets[0].email"
-      value = cred.value.email
-    }
-  }
-
 }
