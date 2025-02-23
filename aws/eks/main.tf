@@ -47,7 +47,7 @@ module "eks" {
       use_name_prefix = false
 
       min_size     = var.min_capacity
-      desired_size = 2
+      desired_size = var.min_capacity
       max_size     = var.max_capacity
 
       update_config = {
