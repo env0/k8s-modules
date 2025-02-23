@@ -70,6 +70,7 @@ module "eks" {
     }
     kube-proxy = {}
     vpc-cni    = {}
+    eks-pod-identity-agent = {}
   }
 
   create_kms_key            = false
