@@ -48,7 +48,7 @@ module "eks" {
 
       min_size     = var.min_capacity
       desired_size = var.min_capacity
-      max_size     = 50
+      max_size     = var.max_capacity
 
       update_config = {
         max_unavailable_percentage = 50

@@ -39,6 +39,11 @@ variable "min_capacity" {
   default     = 2
 }
 
+variable "max_capacity" {
+  description = "Max number of workers"
+  default = 20
+}
+
 variable "instance_types" {
   default = [
     "t3a.2xlarge",
