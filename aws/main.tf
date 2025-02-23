@@ -1,6 +1,5 @@
 locals {
   vpc_id                             = module.vpc.vpc_id
-  efs_id                             = module.efs.efs_id
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
   cluster_endpoint                   = module.eks.cluster_endpoint
 }
@@ -70,4 +69,5 @@ module "calico" {
   source = "./calico"
 
   count = var.enable_calico ? 1 : 0
+  calico_docker_hub_credentials = var.calico_docker_hub_credentials
 }
