@@ -40,24 +40,6 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    deployment = {
-      version = var.kubernetes_version
-
-      name            = local.managed_node_group_name
-      use_name_prefix = false
-
-      min_size     = var.min_capacity
-      desired_size = var.min_capacity
-      max_size     = var.max_capacity
-
-      update_config = {
-        max_unavailable_percentage = 50
-      }
-
-      instance_types = var.instance_types
-      capacity_type  = var.capacity_type
-    }
-
     deployment_v2 = {
       version = var.kubernetes_version
 
