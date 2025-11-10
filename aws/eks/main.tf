@@ -62,7 +62,7 @@ module "eks" {
   cluster_addons = {
     coredns = {
       preserve = true
-      addon_version = "v1.12.4-eksbuild.1"
+      addon_version = var.coredns_version
 
       timeouts = {
         create = "25m"
@@ -70,10 +70,10 @@ module "eks" {
       }
     }
     kube-proxy = {
-      addon_version = "v1.34.0-eksbuild.4"
+      addon_version = var.kube_proxy_version
     }
     vpc-cni    = {
-      addon_version = "v1.20.4-eksbuild.2"
+      addon_version = var.vpc_cni_version
     }
   }
 
