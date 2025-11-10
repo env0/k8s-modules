@@ -1,5 +1,5 @@
 locals {
-  managed_node_group_name = "deployment"
+  managed_node_group_name = "deployment_v2"
 }
 
 module "eks" {
