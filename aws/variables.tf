@@ -83,3 +83,7 @@ variable "calico_docker_hub_credentials" {
   default = null
   sensitive = true
 }
+
+variable "coredns_version" {}
+variable "kube_proxy_version" {}
+variable "vpc_cni_version" {}
