@@ -61,7 +61,7 @@ module "eks" {
     deployment_v2 = {
       version = var.kubernetes_version
 
-      name            = "deployment_v2
+      name            = "deployment_v2"
       use_name_prefix = false
 
       min_size     = var.min_capacity
