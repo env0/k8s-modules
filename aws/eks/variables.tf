@@ -36,3 +36,7 @@ variable "capacity_type" {
 }
 
 variable "cluster_access_entries" {}
+
+variable "coredns_version" {}
+variable "kube_proxy_version" {}
+variable "vpc_cni_version" {}
