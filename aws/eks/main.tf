@@ -25,7 +25,7 @@ module "eks" {
   cluster_endpoint_public_access = true
 
   eks_managed_node_group_defaults = {
-    ami_type = "AL2_x86_64"
+    ami_type = "AL2023_x86_64_STANDARD"
 
     block_device_mappings = {
       xvda = {
@@ -42,6 +42,7 @@ module "eks" {
   eks_managed_node_groups = {
     deployment = {
       version = var.kubernetes_version
+      ami_type = "AL2023_x86_64_STANDARD"
 
       name            = local.managed_node_group_name
       use_name_prefix = false
@@ -69,8 +70,12 @@ module "eks" {
         delete = "10m"
       }
     }
-    kube-proxy = {}
-    vpc-cni    = {}
+    kube-proxy = {
+      addon_version = "v1.34.0-eksbuild.4"
+    }
+    vpc-cni    = {
+      addon_version = "v1.20.4-eksbuild.2"
+    }
   }
 
   create_kms_key            = false
