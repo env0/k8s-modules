@@ -31,6 +31,10 @@ module "eks" {
   capacity_type = var.capacity_type
 
   cluster_access_entries = var.cluster_access_entries
+
+  coredns_version = var.coredns_version
+  kube_proxy_version = var.kube_proxy_version
+  vpc_cni_version = var.vpc_cni_version
 }
 
 module "autoscaler" {
