@@ -62,6 +62,7 @@ module "eks" {
   cluster_addons = {
     coredns = {
       preserve = true
+      addon_version = "v1.12.4-eksbuild.1"
 
       timeouts = {
         create = "25m"
