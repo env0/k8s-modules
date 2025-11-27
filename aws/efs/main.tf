@@ -1,7 +1,7 @@
 module "efs" {
 
   source  = "cloudposse/efs/aws"
-  version = "~> 1.1"
+  version = "~> 1.3.0"
 
   region = var.region
 
