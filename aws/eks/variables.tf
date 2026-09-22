@@ -40,3 +40,9 @@ variable "cluster_access_entries" {}
 variable "coredns_version" {}
 variable "kube_proxy_version" {}
 variable "vpc_cni_version" {}
+
+variable "enable_irsa" {
+  description = "Create an IAM OIDC provider for the cluster (IRSA). When false, add-ons authenticate with EKS Pod Identity instead"
+  type        = bool
+  default     = true
+}

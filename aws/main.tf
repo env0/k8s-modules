@@ -35,11 +35,17 @@ module "eks" {
   coredns_version = var.coredns_version
   kube_proxy_version = var.kube_proxy_version
   vpc_cni_version = var.vpc_cni_version
+
+  enable_irsa = var.enable_irsa
 }
 
 module "autoscaler" {
+  count = var.enable_autoscaler ? 1 : 0
+
   depends_on = [module.eks]
   source = "./autoscaler"
+
+  enable_irsa = var.enable_irsa
 
   cluster_name            = var.cluster_name
   managed_node_group_name = module.eks.managed_node_group_name
@@ -48,6 +54,8 @@ module "autoscaler" {
 }
 
 module "efs" {
+  count = var.enable_efs ? 1 : 0
+
   depends_on = [module.eks, module.vpc]
   source = "./efs"
 
@@ -59,10 +67,13 @@ module "efs" {
 }
 
 module "efs_csi_driver" {
+  count = var.enable_efs ? 1 : 0
+
   depends_on = [module.eks]
   source = "./csi-driver"
 
-  efs_id         = module.efs.efs_id
+  enable_irsa    = var.enable_irsa
+  efs_id         = module.efs[0].efs_id
   reclaim_policy = var.reclaim_policy
 
   cluster_name      = var.cluster_name
@@ -75,4 +86,20 @@ module "calico" {
 
   count = var.enable_calico ? 1 : 0
   calico_docker_hub_credentials = var.calico_docker_hub_credentials
+}
+
+# Keep existing state when the modules above became optional
+moved {
+  from = module.autoscaler
+  to   = module.autoscaler[0]
+}
+
+moved {
+  from = module.efs
+  to   = module.efs[0]
+}
+
+moved {
+  from = module.efs_csi_driver
+  to   = module.efs_csi_driver[0]
 }

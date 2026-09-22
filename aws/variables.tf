@@ -62,7 +62,25 @@ variable "region" {
   default = "us-east-1"
 }
 
+variable "enable_irsa" {
+  description = "Create an IAM OIDC provider for the cluster (IRSA). Set to false when your policy forbids creating identity providers; EFS CSI driver and autoscaler then use EKS Pod Identity. The agent itself needs neither"
+  type        = bool
+  default     = true
+}
+
+variable "enable_autoscaler" {
+  description = "Install the cluster autoscaler"
+  type        = bool
+  default     = true
+}
+
 ## EFS
+variable "enable_efs" {
+  description = "Create an EFS file system and install the EFS CSI driver for persistent deployment state"
+  type        = bool
+  default     = true
+}
+
 variable "reclaim_policy" {
   default = "Retain"
 }

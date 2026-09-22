@@ -3,9 +3,12 @@ locals {
   controller_service_account_name = "efs-csi-controller-sa"
   node_service_account_name       = "efs-csi-node-sa"
   role_name                       = "${var.cluster_name}_AmazonEKS_EFS_CSI_DriverRole"
+  service_account_annotations     = var.enable_irsa ? { "eks.amazonaws.com/role-arn" = module.efs_csi_role[0].iam_role_arn } : {}
 }
 
 module "efs_csi_role" {
+  count = var.enable_irsa ? 1 : 0
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "~> 5.39"
 
@@ -27,7 +30,28 @@ module "efs_csi_role" {
   }
 }
 
+module "efs_csi_pod_identity" {
+  count = var.enable_irsa ? 0 : 1
+
+  source = "../pod-identity"
+
+  cluster_name = var.cluster_name
+  role_name    = local.role_name
+
+  policy_arns = {
+    "AmazonEKS_CSI_EFS_Policy" = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+  }
+
+  service_accounts = {
+    controller = { namespace = local.namespace, name = local.controller_service_account_name }
+    node       = { namespace = local.namespace, name = local.node_service_account_name }
+  }
+}
+
 resource "helm_release" "kubernetes_efs_csi_driver" {
+  # Pod Identity injects credentials only into pods created after the association exists
+  depends_on = [module.efs_csi_pod_identity]
+
   name       = "aws-efs-csi-driver"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   chart      = "aws-efs-csi-driver"
@@ -40,20 +64,16 @@ resource "helm_release" "kubernetes_efs_csi_driver" {
     yamlencode({
       controller = {
         serviceAccount = {
-          create = true
-          name   = local.controller_service_account_name
-          annotations = {
-            "eks.amazonaws.com/role-arn" = module.efs_csi_role.iam_role_arn
-          }
+          create      = true
+          name        = local.controller_service_account_name
+          annotations = local.service_account_annotations
         }
       }
       node = {
         serviceAccount = {
-          create = true
-          name   = local.node_service_account_name
-          annotations = {
-            "eks.amazonaws.com/role-arn" = module.efs_csi_role.iam_role_arn
-          }
+          create      = true
+          name        = local.node_service_account_name
+          annotations = local.service_account_annotations
         }
       }
     })

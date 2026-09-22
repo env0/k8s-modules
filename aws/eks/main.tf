@@ -9,7 +9,7 @@ module "eks" {
   cluster_name    = var.cluster_name
   cluster_version = var.kubernetes_version
 
-  enable_irsa = true
+  enable_irsa = var.enable_irsa
 
   enable_cluster_creator_admin_permissions = true
 
@@ -59,7 +59,7 @@ module "eks" {
     }
   }
 
-  cluster_addons = {
+  cluster_addons = merge({
     coredns = {
       preserve = true
       addon_version = var.coredns_version
@@ -75,7 +75,7 @@ module "eks" {
     vpc-cni    = {
       addon_version = var.vpc_cni_version
     }
-  }
+  }, var.enable_irsa ? {} : { eks-pod-identity-agent = {} })
 
   create_kms_key            = false
   enable_kms_key_rotation   = false

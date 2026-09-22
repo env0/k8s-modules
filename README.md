@@ -16,6 +16,21 @@ module "my-cluster" {
   cluster_name = var.cluster_name
 }
 ``` 
+By default the cluster gets an IAM OIDC provider (IRSA), used only by the EFS CSI driver and the cluster autoscaler. If your security policy forbids creating IAM identity providers, turn it off; those two add-ons then use [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html) instead. The env0 agent itself uses neither. Both add-ons are optional too, so a minimal cluster with no storage and no autoscaler is:
+```terraform
+module "my-cluster" {
+  source = "github.com/env0/k8s-modules//aws"
+
+  region       = var.region
+  cluster_name = var.cluster_name
+
+  enable_irsa       = false
+  enable_efs        = false
+  enable_autoscaler = false
+}
+```
+Without EFS, install the agent chart with `env0StateEncryptionKey` set so deployment state is stored encrypted in env0 instead of on a persistent volume.
+
 #### Partial installation
 You can also just pick out the parts necessary for your installation.
 Check the `versions.tf` of submodule to know which providers are needed, check the `providers.tf` file of the root module to know how to configure them.
