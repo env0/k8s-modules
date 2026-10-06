@@ -79,7 +79,6 @@ module "calico" {
   source = "./calico"
 
   count = var.enable_calico ? 1 : 0
-  calico_docker_hub_credentials = var.calico_docker_hub_credentials
 }
 
 moved {
