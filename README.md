@@ -34,14 +34,16 @@ The agent stores the deployment state and working directory with [env zero-hoste
 terraform {
   required_providers {
     env0 = {
-      source = "env0/env0"
+      source  = "env0/env0"
+      version = "~> 1.33"
     }
     helm = {
       source  = "hashicorp/helm"
       version = ">= 2.13.0, < 3.0.0"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
+      version = "~> 3.6"
     }
   }
 }
