@@ -180,13 +180,48 @@ The module then creates an EFS file system, the EFS CSI driver, and the `env0-st
 
 The cluster-autoscaler minor version must match the Kubernetes minor version.
 Chart `9.59.0` ships cluster-autoscaler `1.35`.
-If you set another `kubernetes_version`, set `cluster_autoscaler_chart_version` to a chart for that minor version:
+If you set another `kubernetes_version`, set `cluster_autoscaler_chart_version` to a chart for that minor version.
+List the charts and the cluster-autoscaler version each one ships (the `APP VERSION` column):
 
 ```bash
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
 helm search repo autoscaler/cluster-autoscaler --versions
 ```
 
-Run `helm repo add autoscaler https://kubernetes.github.io/autoscaler` first.
+### Upgrade the Kubernetes version
+
+EKS upgrades the control plane one minor version at a time. To go from 1.33 to 1.35, run two upgrades: 1.33 to 1.34, then 1.34 to 1.35.
+
+For each upgrade, change these inputs together in one apply:
+
+| Input | Set it to |
+|---|---|
+| `kubernetes_version` | The next minor version, for example `1.35` |
+| `cluster_autoscaler_chart_version` | A chart that ships cluster-autoscaler for that minor version, see [Kubernetes and autoscaler versions](#kubernetes-and-autoscaler-versions). Not needed when you move to `1.35` and leave this input unset (default `9.59.0`) |
+| `coredns_version`, `kube_proxy_version`, `vpc_cni_version` | Only if you set them: versions for the new Kubernetes version. Or remove them, so EKS uses its default addon versions for that Kubernetes version |
+
+List the addon versions for a Kubernetes version. The default version has `True` in the `Defaultversion` column:
+
+```bash
+aws eks describe-addon-versions --addon-name coredns --kubernetes-version 1.35 \
+  --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output table
+```
+
+Repeat with `--addon-name kube-proxy` and `--addon-name vpc-cni`.
+
+One apply upgrades in this order:
+
+1. The EKS control plane moves to the new version.
+2. The managed node group follows the control plane version. EKS replaces the nodes, up to 50% of the nodes at a time.
+3. The `coredns`, `kube-proxy` and `vpc-cni` addons update.
+4. The cluster-autoscaler Helm release updates.
+
+What goes wrong if you skip an input:
+
+- Pinned addon versions stay on their old versions. The plan shows no addon change.
+- `cluster_autoscaler_chart_version` stays on the old minor version, which the cluster-autoscaler project does not test against the new Kubernetes version.
+
+Node replacement evicts the pods on the old nodes. A deployment pod that is running on one of them stops, and that deployment can fail. Run the upgrade when no env zero deployments are running on the agent.
 
 ### Upgrade from v1.1.0
 
