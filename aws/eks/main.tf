@@ -41,8 +41,6 @@ module "eks" {
 
   eks_managed_node_groups = {
     deployment_v2 = {
-      version = var.kubernetes_version
-
       name            = "deployment_v2"
       use_name_prefix = false
 
