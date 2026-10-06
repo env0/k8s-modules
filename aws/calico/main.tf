@@ -14,9 +14,9 @@ locals {
 }
 
 resource "helm_release" "calico" {
-  repository = "https://docs.projectcalico.org/charts/"
+  repository = "https://docs.tigera.io/calico/charts"
   chart      = "tigera-operator"
-  version    = "3.27.3"
+  version    = "v3.33.0"
 
   name             = "calico"
   namespace        = "tigera-operator"
