@@ -45,11 +45,14 @@ module "autoscaler" {
   managed_node_group_name = module.eks.managed_node_group_name
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn       = module.eks.oidc_provider_arn
+  helm_chart_version      = var.cluster_autoscaler_chart_version
 }
 
 module "efs" {
   depends_on = [module.eks, module.vpc]
   source = "./efs"
+
+  count = var.create_efs_storage ? 1 : 0
 
   region       = var.region
   vpc_id       = local.vpc_id
@@ -62,7 +65,9 @@ module "efs_csi_driver" {
   depends_on = [module.eks]
   source = "./csi-driver"
 
-  efs_id         = module.efs.efs_id
+  count = var.create_efs_storage ? 1 : 0
+
+  efs_id         = module.efs[0].efs_id
   reclaim_policy = var.reclaim_policy
 
   cluster_name      = var.cluster_name
@@ -75,4 +80,14 @@ module "calico" {
 
   count = var.enable_calico ? 1 : 0
   calico_docker_hub_credentials = var.calico_docker_hub_credentials
+}
+
+moved {
+  from = module.efs
+  to   = module.efs[0]
+}
+
+moved {
+  from = module.efs_csi_driver
+  to   = module.efs_csi_driver[0]
 }
