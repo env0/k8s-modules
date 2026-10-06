@@ -35,7 +35,7 @@ variable "kubernetes_version" {
 }
 
 variable "cluster_autoscaler_chart_version" {
-  description = "cluster-autoscaler Helm chart version. 9.59.0 ships cluster-autoscaler 1.35, matching the default kubernetes_version"
+  description = "cluster-autoscaler Helm chart version. Its cluster-autoscaler minor version must match the kubernetes_version minor version. The default 9.59.0 ships cluster-autoscaler 1.35. For other versions run: helm search repo autoscaler/cluster-autoscaler --versions"
   type        = string
   default     = "9.59.0"
 }
