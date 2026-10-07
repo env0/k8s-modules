@@ -23,7 +23,7 @@ The agent stores the deployment state and working directory with [env zero-hoste
 
 ### Prerequisites
 
-- Terraform >= 1.3 or OpenTofu.
+- Terraform >= 1.3.2 or OpenTofu.
 - AWS credentials that can create a VPC, EKS, IAM roles and Auto Scaling settings.
 - AWS CLI v2 and `bash` on the machine that runs Terraform. The providers use `aws eks get-token`, and the `autoscaler` submodule runs `aws autoscaling` commands.
 - An env zero organization API key, set in `ENV0_API_KEY` and `ENV0_API_SECRET`. See [API keys](https://docs.envzero.com/guides/admin-guide/user-role-and-team-management/api-keys).
@@ -62,7 +62,6 @@ module "cluster" {
   region       = var.region
   cluster_name = var.cluster_name
 
-  # The agent uses env zero-hosted encrypted state, so no EFS is needed
   create_efs_storage = false
 }
 
@@ -99,7 +98,10 @@ resource "helm_release" "env0_agent" {
   repository = "https://env0.github.io/self-hosted"
   chart      = "env0-agent"
   # Latest chart: https://github.com/env0/self-hosted/releases
-  version = "v5.5.5"
+  version = "v5.5.6"
+
+  # Wait for the node group and the addons, so the agent pods can start
+  depends_on = [module.cluster]
 
   name             = "env0-agent"
   namespace        = "env0-agent"
