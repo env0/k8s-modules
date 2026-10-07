@@ -5,6 +5,7 @@ data "aws_eks_node_group" "node_group" {
 
 locals {
   autoscaling_group_name = data.aws_eks_node_group.node_group.resources.0.autoscaling_groups.0.name
+  region_flag            = var.region == null ? "" : "--region ${var.region}"
 }
 
 module "eks-cluster-autoscaler" {
@@ -16,7 +17,7 @@ module "eks-cluster-autoscaler" {
   cluster_identity_oidc_issuer_arn = var.oidc_provider_arn
 
   # make sure that chart version matches the cluster version
-  helm_chart_version = "9.33.0"
+  helm_chart_version = var.helm_chart_version
 
   values = yamlencode({
     # Here you we can further configure the autoscaler:
@@ -32,9 +33,9 @@ resource "null_resource" "autoscaling_settings" {
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
     command     = <<-SCRIPT
-      aws autoscaling suspend-processes --auto-scaling-group-name ${local.autoscaling_group_name} --scaling-processes AZRebalance
-      aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${local.autoscaling_group_name} --default-cooldown 60
-      aws autoscaling enable-metrics-collection --auto-scaling-group-name ${local.autoscaling_group_name} --granularity "1Minute"
+      aws autoscaling suspend-processes --auto-scaling-group-name ${local.autoscaling_group_name} --scaling-processes AZRebalance ${local.region_flag}
+      aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${local.autoscaling_group_name} --default-cooldown 60 ${local.region_flag}
+      aws autoscaling enable-metrics-collection --auto-scaling-group-name ${local.autoscaling_group_name} --granularity "1Minute" ${local.region_flag}
     SCRIPT
   }
 }

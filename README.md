@@ -1,39 +1,268 @@
 # k8s-modules
-This repository contains live examples for creation of kubernetes cluster which can run env0 deployments.
-You can take those examples and use them as-is or fork the repo and adjust for yourself.
 
-You can, of course, mix and match according to your own needs.
+Terraform modules that provision a Kubernetes cluster for the [env zero self-hosted agent](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/overview).
+Use them as-is, pick single submodules, or fork the repository and adjust them.
 
-### AWS 
-#### Creating a full-blown cluster installation
-If you'd like to create a cluster from scratch, including a VPC and an EFS for storage, you can simply use the `aws` root folder as a module.
+| Folder | What it creates |
+|---|---|
+| [`aws`](aws) | A full EKS stack: VPC, EKS cluster, cluster autoscaler, and optional EFS storage and Calico |
+| [`aws/<submodule>`](aws) | One part of the AWS stack: `vpc`, `eks`, `autoscaler`, `efs`, `csi-driver`, `calico` |
+| [`gcp`](gcp) | NFS storage prerequisites for the agent on an existing GKE cluster |
+| [`log-storage/aws/dynamodb`](log-storage/aws/dynamodb) | DynamoDB tables for [hosting the deployment logs](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/hosting-the-deployment-logs) in your AWS account |
+
+## Versioning
+
+Pin every module source to a release tag with `?ref=<tag>`.
+Use the [latest release](https://github.com/env0/k8s-modules/releases/latest).
+The examples below use `v1.2.0`.
+
+## Bootstrap a self-hosted agent on AWS
+
+The example creates an EKS cluster, an agent pool in env zero, an agent secret, and installs the agent Helm chart.
+The agent stores the deployment state and working directory with [env zero-hosted encrypted state](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/env-zero-hosted-encrypted-state), so the cluster needs no EFS or persistent volume.
+
+### Prerequisites
+
+- Terraform >= 1.3.2 or OpenTofu.
+- AWS credentials that can create a VPC, EKS, IAM roles and Auto Scaling settings.
+- AWS CLI v2 and `bash` on the machine that runs Terraform. The providers use `aws eks get-token`, and the `autoscaler` submodule runs `aws autoscaling` commands.
+- An env zero organization API key, set in `ENV0_API_KEY` and `ENV0_API_SECRET`. See [API keys](https://docs.envzero.com/guides/admin-guide/user-role-and-team-management/api-keys).
+
+### Example
+
 ```terraform
-// cluster.tf
-module "my-cluster" {
-  source = "github.com/env0/k8s-modules//aws"
+terraform {
+  required_providers {
+    env0 = {
+      source  = "env0/env0"
+      version = "~> 1.33"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.13.0, < 3.0.0"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.6"
+    }
+  }
+}
+
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "cluster_name" {
+  default = "env0-agent"
+}
+
+module "cluster" {
+  source = "github.com/env0/k8s-modules//aws?ref=v1.2.0"
 
   region       = var.region
   cluster_name = var.cluster_name
-}
-``` 
-#### Partial installation
-You can also just pick out the parts necessary for your installation.
-Check the `versions.tf` of submodule to know which providers are needed, check the `providers.tf` file of the root module to know how to configure them.
- 
-For example, only create a EFS CSI driver for storage:
-```terraform
-// csi-driver.tf
-module "csi-driver" {
-  source = "github.com/env0/k8s-modules//aws/csi-driver"
 
-  cluster_name = "eks_corporation_prod"
-  efs_id = var.efs_id
+  create_efs_storage = false
+}
+
+provider "env0" {}
+
+provider "helm" {
+  kubernetes {
+    host                   = module.cluster.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.cluster.cluster_certificate_authority_data)
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args        = ["eks", "get-token", "--cluster-name", module.cluster.cluster_name, "--region", var.region]
+    }
+  }
+}
+
+resource "env0_agent_pool" "this" {
+  name = var.cluster_name
+}
+
+resource "env0_agent_secret" "this" {
+  agent_id = env0_agent_pool.this.id
+}
+
+# Encrypts the state and working directory before the agent uploads them.
+# Changing this value later loses the local state of existing environments.
+resource "random_password" "state_encryption_key" {
+  length  = 32
+  special = false
+}
+
+resource "helm_release" "env0_agent" {
+  repository = "https://env0.github.io/self-hosted"
+  chart      = "env0-agent"
+  # Latest chart: https://github.com/env0/self-hosted/releases
+  version = "v5.5.6"
+
+  # Wait for the node group and the addons, so the agent pods can start
+  depends_on = [module.cluster]
+
+  name             = "env0-agent"
+  namespace        = "env0-agent"
+  create_namespace = true
+  timeout          = 600
+
+  set_sensitive {
+    name  = "agentAccessToken"
+    value = env0_agent_secret.this.secret
+  }
+
+  set_sensitive {
+    name  = "env0StateEncryptionKey"
+    value = base64encode(random_password.state_encryption_key.result)
+  }
 }
 ```
 
-### Installing the env0 agent
-Use env0 provider to create an agent pool and secret, and helm provider to install the agent chart - see [example](https://search.opentofu.org/provider/env0/env0/latest/docs/resources/agent_pool#example-usage).
+Run it:
 
-#### Alternative Log Storage
-You can store the deployment logs on your own cloud provider, for supported cloud providers. See `log-storage/README.md` for more details. 
+```bash
+terraform init
+terraform apply
+```
 
+The apply usually takes 15 to 25 minutes. Most of the time goes to the EKS cluster and node group.
+After the apply, the agent pool shows in env zero under **Organization Settings** > **Agents**.
+
+### Assign the agent to a project
+
+```terraform
+resource "env0_agent_project_assignment" "this" {
+  agent_id   = env0_agent_pool.this.id
+  project_id = "<project-id>"
+}
+```
+
+### Use EFS for the agent state instead
+
+Some organizations must keep the state and working directory in their own AWS account.
+For that, keep the default `create_efs_storage = true` and remove the `env0StateEncryptionKey` block and the `random_password` resource.
+The module then creates an EFS file system, the EFS CSI driver, and the `env0-state-sc` StorageClass that the agent chart uses for its persistent volume.
+
+### Next steps
+
+- [Custom/optional configuration](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/custom-optional-configuration): add Helm values to `helm_release.env0_agent`.
+- [Authenticating the agent on AWS EKS](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/authenticating-the-agent-on-aws-eks): give deployments an IAM role. The `oidc_provider_arn` output feeds the IAM role trust policy.
+
+## `aws` module reference
+
+### Inputs
+
+| Name | Default | Description |
+|---|---|---|
+| `cluster_name` | (required) | Name of the EKS cluster. Also used to name the VPC, EFS and IAM roles |
+| `region` | `us-east-1` | AWS region |
+| `kubernetes_version` | `1.35` | EKS Kubernetes version |
+| `cluster_autoscaler_chart_version` | `9.59.0` | cluster-autoscaler Helm chart version. Change it when you change `kubernetes_version`, see below |
+| `create_efs_storage` | `true` | Create EFS, the EFS CSI driver and the `env0-state-sc` StorageClass |
+| `reclaim_policy` | `Retain` | Reclaim policy of the `env0-state-sc` StorageClass |
+| `min_capacity` / `max_capacity` | `2` / `20` | Node group size limits |
+| `instance_types` | `t3a.2xlarge`, `t3a.xlarge`, `t3.2xlarge`, `t3.xlarge` | Node instance types |
+| `capacity_type` | `SPOT` | `SPOT` or `ON_DEMAND` |
+| `cluster_access_entries` | `{}` | Extra EKS access entries |
+| `coredns_version` / `kube_proxy_version` / `vpc_cni_version` | `null` | EKS addon versions. `null` uses the EKS default for `kubernetes_version` |
+| `azs` | `[]` | Availability zones for the subnets. Empty uses up to 3 available zones that EKS supports |
+| `cidr`, `private_subnets_cidr_blocks`, `public_subnets_cidr_blocks` | see [`aws/variables.tf`](aws/variables.tf) | VPC layout |
+| `enable_calico` | `false` | Install Calico (tigera-operator chart `v3.31.7`) for network policy enforcement |
+| `calico_docker_hub_credentials` | `null` | Deprecated and ignored. Calico v3.30 and later pull their images from quay.io |
+
+### Outputs
+
+| Name | Description |
+|---|---|
+| `cluster_name` | EKS cluster name |
+| `cluster_endpoint` | EKS API server endpoint |
+| `cluster_certificate_authority_data` | Base64 cluster CA certificate |
+| `oidc_provider_arn` | ARN of the cluster OIDC provider, for IAM roles for service accounts |
+
+### Kubernetes and autoscaler versions
+
+The cluster-autoscaler minor version must match the Kubernetes minor version.
+Chart `9.59.0` ships cluster-autoscaler `1.35`.
+If you set another `kubernetes_version`, set `cluster_autoscaler_chart_version` to a chart for that minor version.
+List the charts and the cluster-autoscaler version each one ships (the `APP VERSION` column):
+
+```bash
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+helm search repo autoscaler/cluster-autoscaler --versions
+```
+
+### Upgrade the Kubernetes version
+
+EKS upgrades the control plane one minor version at a time. To go from 1.33 to 1.35, run two upgrades: 1.33 to 1.34, then 1.34 to 1.35.
+
+For each upgrade, change these inputs together in one apply:
+
+| Input | Set it to |
+|---|---|
+| `kubernetes_version` | The next minor version, for example `1.35` |
+| `cluster_autoscaler_chart_version` | A chart that ships cluster-autoscaler for that minor version, see [Kubernetes and autoscaler versions](#kubernetes-and-autoscaler-versions). Not needed when you move to `1.35` and leave this input unset (default `9.59.0`) |
+| `coredns_version`, `kube_proxy_version`, `vpc_cni_version` | Only if you set them: versions for the new Kubernetes version. Or remove them, so EKS uses its default addon versions for that Kubernetes version |
+
+List the addon versions for a Kubernetes version. The default version has `True` in the `Defaultversion` column:
+
+```bash
+aws eks describe-addon-versions --addon-name coredns --kubernetes-version 1.35 \
+  --query 'addons[].addonVersions[].{Version: addonVersion, Defaultversion: compatibilities[0].defaultVersion}' --output table
+```
+
+Repeat with `--addon-name kube-proxy` and `--addon-name vpc-cni`.
+
+One apply upgrades in this order:
+
+1. The EKS control plane moves to the new version.
+2. The managed node group follows the control plane version. EKS replaces the nodes, up to 50% of the nodes at a time.
+3. The `coredns`, `kube-proxy` and `vpc-cni` addons update.
+4. The cluster-autoscaler Helm release updates.
+
+What goes wrong if you skip an input:
+
+- Pinned addon versions stay on their old versions. The plan shows no addon change.
+- `cluster_autoscaler_chart_version` stays on the old minor version, which the cluster-autoscaler project does not test against the new Kubernetes version.
+
+Node replacement evicts the pods on the old nodes. A deployment pod that is running on one of them stops, and that deployment can fail. Run the upgrade when no env zero deployments are running on the agent.
+
+### Upgrade from v1.1.0
+
+- `kubernetes_version`, `coredns_version`, `kube_proxy_version` and `vpc_cni_version` are now optional. Keep passing them to keep your current versions.
+- The EFS submodules moved to `module.efs[0]` and `module.efs_csi_driver[0]`. `moved` blocks handle the move. Expect no EFS changes in the plan.
+- The cluster-autoscaler chart moved from `9.33.0` to `9.59.0`. Set `cluster_autoscaler_chart_version` if your cluster is not on Kubernetes 1.35.
+- Calico moved from `3.27.3` to `v3.31.7`, which pulls its images from quay.io instead of Docker Hub. `calico_docker_hub_credentials` is now ignored, and the upgrade removes the `calico-image-pull-secret` Secret. Remove the input from your configuration.
+- If `enable_calico = true`, apply the Calico v3.31.7 CRDs before you apply the module. Helm installs CRDs only on the first install, so the chart upgrade does not update them:
+
+  ```bash
+  kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/projectcalico/calico/v3.31.7/manifests/operator-crds.yaml
+  ```
+
+- The AWS CLI calls in the providers and the `autoscaler` submodule now pass `--region`, so they no longer depend on the AWS CLI default region.
+
+## Use a single submodule
+
+Each submodule lists its providers in its `versions.tf`. See [`aws/providers.tf`](aws/providers.tf) for how to configure them.
+
+For example, to create only the EFS CSI driver and StorageClass:
+
+```terraform
+module "csi_driver" {
+  source = "github.com/env0/k8s-modules//aws/csi-driver?ref=v1.2.0"
+
+  cluster_name      = "my-cluster"
+  efs_id            = var.efs_id
+  oidc_provider_arn = var.oidc_provider_arn
+}
+```
+
+## GCP
+
+The [`gcp`](gcp) folder installs an NFS server provisioner on an existing GKE cluster, for the agent persistent volume. See [`gcp/README.md`](gcp/README.md).
+With env zero-hosted encrypted state, the agent needs no persistent volume, so you can skip this folder.
+
+## Deployment log storage
+
+To keep the deployment logs in your own AWS account, see [`log-storage/README.md`](log-storage/README.md).

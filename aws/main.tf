@@ -1,4 +1,18 @@
+# EKS does not allow subnets in these zones:
+# https://docs.aws.amazon.com/eks/latest/userguide/network-reqs.html
+data "aws_availability_zones" "available" {
+  state            = "available"
+  exclude_zone_ids = ["use1-az3", "usw1-az2", "cac1-az3"]
+
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
 locals {
+  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, min(3, length(data.aws_availability_zones.available.names)))
+
   vpc_id                             = module.vpc.vpc_id
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
   cluster_endpoint                   = module.eks.cluster_endpoint
@@ -9,7 +23,7 @@ module "vpc" {
 
   cluster_name = var.cluster_name
 
-  azs                         = var.azs
+  azs                         = local.azs
   cidr                        = var.cidr
   private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
   public_subnets_cidr_blocks  = var.public_subnets_cidr_blocks
@@ -37,19 +51,25 @@ module "eks" {
   vpc_cni_version = var.vpc_cni_version
 }
 
+# The in-cluster Helm releases depend on module.vpc so that destroy removes them
+# while the NAT gateway still exists: their uninstall hooks pull images.
 module "autoscaler" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./autoscaler"
 
   cluster_name            = var.cluster_name
   managed_node_group_name = module.eks.managed_node_group_name
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn       = module.eks.oidc_provider_arn
+  helm_chart_version      = var.cluster_autoscaler_chart_version
+  region                  = var.region
 }
 
 module "efs" {
   depends_on = [module.eks, module.vpc]
   source = "./efs"
+
+  count = var.create_efs_storage ? 1 : 0
 
   region       = var.region
   vpc_id       = local.vpc_id
@@ -59,10 +79,12 @@ module "efs" {
 }
 
 module "efs_csi_driver" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./csi-driver"
 
-  efs_id         = module.efs.efs_id
+  count = var.create_efs_storage ? 1 : 0
+
+  efs_id         = module.efs[0].efs_id
   reclaim_policy = var.reclaim_policy
 
   cluster_name      = var.cluster_name
@@ -70,9 +92,18 @@ module "efs_csi_driver" {
 }
 
 module "calico" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./calico"
 
   count = var.enable_calico ? 1 : 0
-  calico_docker_hub_credentials = var.calico_docker_hub_credentials
+}
+
+moved {
+  from = module.efs
+  to   = module.efs[0]
+}
+
+moved {
+  from = module.efs_csi_driver
+  to   = module.efs_csi_driver[0]
 }

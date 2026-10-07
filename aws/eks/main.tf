@@ -4,7 +4,7 @@ locals {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.31.4"
+  version = "20.37.2"
 
   cluster_name    = var.cluster_name
   cluster_version = var.kubernetes_version
@@ -41,8 +41,6 @@ module "eks" {
 
   eks_managed_node_groups = {
     deployment_v2 = {
-      version = var.kubernetes_version
-
       name            = "deployment_v2"
       use_name_prefix = false
 

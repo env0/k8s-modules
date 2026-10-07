@@ -29,6 +29,7 @@ resource "helm_release" "nfs_server_provisioner" {
   name       = "nfs-server-provisioner"
   repository = "https://kubernetes-sigs.github.io/nfs-ganesha-server-and-external-provisioner/"
   chart      = "nfs-server-provisioner"
+  version    = "1.8.0"
   timeout    = 600
 
   values = [

@@ -1,22 +1,10 @@
-locals {
-  image_pull_secrets = {
-    "calico-image-pull-secret": jsonencode({
-      auths = {
-        "docker.io" = {
-          username = var.calico_docker_hub_credentials.username,
-          password = var.calico_docker_hub_credentials.password,
-          email    = var.calico_docker_hub_credentials.email,
-          auth     = base64encode("${var.calico_docker_hub_credentials.username}:${var.calico_docker_hub_credentials.password}")
-        }
-      }
-    })
-  }
-}
-
+# v3.31 is the last chart line that ships the Calico CRDs (crds/). From v3.32 the
+# CRDs live in a separate chart. Helm installs crds/ only on install, so an
+# upgrade needs the CRDs applied first, see the README upgrade notes.
 resource "helm_release" "calico" {
-  repository = "https://docs.projectcalico.org/charts/"
+  repository = "https://docs.tigera.io/calico/charts"
   chart      = "tigera-operator"
-  version    = "3.27.3"
+  version    = "v3.31.7"
 
   name             = "calico"
   namespace        = "tigera-operator"
@@ -25,15 +13,10 @@ resource "helm_release" "calico" {
   timeout = 600
 
   values = [
-    yamlencode(
-      merge(
-        {
-          apiServer = {
-            enabled = false
-          }
-        },
-          var.calico_docker_hub_credentials != null ? { imagePullSecrets = local.image_pull_secrets  } : {}
-      )
-    )
+    yamlencode({
+      apiServer = {
+        enabled = false
+      }
+    })
   ]
 }
