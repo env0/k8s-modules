@@ -51,8 +51,10 @@ module "eks" {
   vpc_cni_version = var.vpc_cni_version
 }
 
+# The in-cluster Helm releases depend on module.vpc so that destroy removes them
+# while the NAT gateway still exists: their uninstall hooks pull images.
 module "autoscaler" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./autoscaler"
 
   cluster_name            = var.cluster_name
@@ -77,7 +79,7 @@ module "efs" {
 }
 
 module "efs_csi_driver" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./csi-driver"
 
   count = var.create_efs_storage ? 1 : 0
@@ -90,7 +92,7 @@ module "efs_csi_driver" {
 }
 
 module "calico" {
-  depends_on = [module.eks]
+  depends_on = [module.eks, module.vpc]
   source = "./calico"
 
   count = var.enable_calico ? 1 : 0
