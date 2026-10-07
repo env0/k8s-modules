@@ -1,6 +1,6 @@
 ## VPC
 variable "azs" {
-  description = "A list of availability zones names or ids in the region. Empty uses the first 3 available zones that EKS supports"
+  description = "A list of availability zones names or ids in the region. Empty uses up to 3 available zones that EKS supports"
   type        = list(string)
   default     = []
 }

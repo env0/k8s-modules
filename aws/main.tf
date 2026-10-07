@@ -11,7 +11,7 @@ data "aws_availability_zones" "available" {
 }
 
 locals {
-  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, 3)
+  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, min(3, length(data.aws_availability_zones.available.names)))
 
   vpc_id                             = module.vpc.vpc_id
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data

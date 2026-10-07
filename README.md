@@ -167,7 +167,7 @@ The module then creates an EFS file system, the EFS CSI driver, and the `env0-st
 | `capacity_type` | `SPOT` | `SPOT` or `ON_DEMAND` |
 | `cluster_access_entries` | `{}` | Extra EKS access entries |
 | `coredns_version` / `kube_proxy_version` / `vpc_cni_version` | `null` | EKS addon versions. `null` uses the EKS default for `kubernetes_version` |
-| `azs` | `[]` | Availability zones for the subnets. Empty uses the first 3 available zones that EKS supports |
+| `azs` | `[]` | Availability zones for the subnets. Empty uses up to 3 available zones that EKS supports |
 | `cidr`, `private_subnets_cidr_blocks`, `public_subnets_cidr_blocks` | see [`aws/variables.tf`](aws/variables.tf) | VPC layout |
 | `enable_calico` | `false` | Install Calico (tigera-operator chart `v3.31.7`) for network policy enforcement |
 | `calico_docker_hub_credentials` | `null` | Deprecated and ignored. Calico v3.30 and later pull their images from quay.io |
