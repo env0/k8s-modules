@@ -1,6 +1,6 @@
 ## VPC
 variable "azs" {
-  description = "A list of availability zones names or ids in the region"
+  description = "A list of availability zones names or ids in the region. Empty uses the first 3 available zones that EKS supports"
   type        = list(string)
   default     = []
 }
@@ -93,7 +93,7 @@ variable "enable_calico" {
 }
 
 variable "calico_docker_hub_credentials" {
-  description = "Deprecated and ignored. Calico v3.33 pulls its images from quay.io, so it needs no Docker Hub credentials"
+  description = "Deprecated and ignored. Calico v3.30 and later pull their images from quay.io, so it needs no Docker Hub credentials"
   type = object({
     username = string
     password = string

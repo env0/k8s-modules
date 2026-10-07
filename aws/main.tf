@@ -1,4 +1,18 @@
+# EKS does not allow subnets in these zones:
+# https://docs.aws.amazon.com/eks/latest/userguide/network-reqs.html
+data "aws_availability_zones" "available" {
+  state            = "available"
+  exclude_zone_ids = ["use1-az3", "usw1-az2", "cac1-az3"]
+
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
 locals {
+  azs = length(var.azs) > 0 ? var.azs : slice(data.aws_availability_zones.available.names, 0, 3)
+
   vpc_id                             = module.vpc.vpc_id
   cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
   cluster_endpoint                   = module.eks.cluster_endpoint
@@ -9,7 +23,7 @@ module "vpc" {
 
   cluster_name = var.cluster_name
 
-  azs                         = var.azs
+  azs                         = local.azs
   cidr                        = var.cidr
   private_subnets_cidr_blocks = var.private_subnets_cidr_blocks
   public_subnets_cidr_blocks  = var.public_subnets_cidr_blocks
@@ -46,6 +60,7 @@ module "autoscaler" {
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn       = module.eks.oidc_provider_arn
   helm_chart_version      = var.cluster_autoscaler_chart_version
+  region                  = var.region
 }
 
 module "efs" {

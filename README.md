@@ -98,6 +98,8 @@ resource "random_password" "state_encryption_key" {
 resource "helm_release" "env0_agent" {
   repository = "https://env0.github.io/self-hosted"
   chart      = "env0-agent"
+  # Latest chart: https://github.com/env0/self-hosted/releases
+  version = "v5.5.5"
 
   name             = "env0-agent"
   namespace        = "env0-agent"
@@ -163,9 +165,10 @@ The module then creates an EFS file system, the EFS CSI driver, and the `env0-st
 | `capacity_type` | `SPOT` | `SPOT` or `ON_DEMAND` |
 | `cluster_access_entries` | `{}` | Extra EKS access entries |
 | `coredns_version` / `kube_proxy_version` / `vpc_cni_version` | `null` | EKS addon versions. `null` uses the EKS default for `kubernetes_version` |
-| `azs`, `cidr`, `private_subnets_cidr_blocks`, `public_subnets_cidr_blocks` | see [`aws/variables.tf`](aws/variables.tf) | VPC layout |
-| `enable_calico` | `false` | Install Calico for network policy enforcement |
-| `calico_docker_hub_credentials` | `null` | Deprecated and ignored. Calico v3.33 pulls its images from quay.io |
+| `azs` | `[]` | Availability zones for the subnets. Empty uses the first 3 available zones that EKS supports |
+| `cidr`, `private_subnets_cidr_blocks`, `public_subnets_cidr_blocks` | see [`aws/variables.tf`](aws/variables.tf) | VPC layout |
+| `enable_calico` | `false` | Install Calico (tigera-operator chart `v3.31.7`) for network policy enforcement |
+| `calico_docker_hub_credentials` | `null` | Deprecated and ignored. Calico v3.30 and later pull their images from quay.io |
 
 ### Outputs
 
@@ -228,7 +231,14 @@ Node replacement evicts the pods on the old nodes. A deployment pod that is runn
 - `kubernetes_version`, `coredns_version`, `kube_proxy_version` and `vpc_cni_version` are now optional. Keep passing them to keep your current versions.
 - The EFS submodules moved to `module.efs[0]` and `module.efs_csi_driver[0]`. `moved` blocks handle the move. Expect no EFS changes in the plan.
 - The cluster-autoscaler chart moved from `9.33.0` to `9.59.0`. Set `cluster_autoscaler_chart_version` if your cluster is not on Kubernetes 1.35.
-- Calico moved from `3.27.3` to `v3.33.0`, which pulls its images from quay.io instead of Docker Hub. `calico_docker_hub_credentials` is now ignored, and the upgrade removes the `calico-image-pull-secret` Secret. Remove the input from your configuration.
+- Calico moved from `3.27.3` to `v3.31.7`, which pulls its images from quay.io instead of Docker Hub. `calico_docker_hub_credentials` is now ignored, and the upgrade removes the `calico-image-pull-secret` Secret. Remove the input from your configuration.
+- If `enable_calico = true`, apply the Calico v3.31.7 CRDs before you apply the module. Helm installs CRDs only on the first install, so the chart upgrade does not update them:
+
+  ```bash
+  kubectl apply --server-side --force-conflicts -f https://raw.githubusercontent.com/projectcalico/calico/v3.31.7/manifests/operator-crds.yaml
+  ```
+
+- The AWS CLI calls in the providers and the `autoscaler` submodule now pass `--region`, so they no longer depend on the AWS CLI default region.
 
 ## Use a single submodule
 
