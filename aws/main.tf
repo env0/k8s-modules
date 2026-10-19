@@ -39,48 +39,51 @@ module "eks" {
   vpc_id     = local.vpc_id
   subnet_ids = module.vpc.private_subnet_ids
 
-  min_capacity  = var.min_capacity
-  max_capacity = var.max_capacity
+  min_capacity   = var.min_capacity
+  max_capacity   = var.max_capacity
   instance_types = var.instance_types
-  capacity_type = var.capacity_type
+  capacity_type  = var.capacity_type
 
   cluster_access_entries = var.cluster_access_entries
 
-  coredns_version = var.coredns_version
+  coredns_version    = var.coredns_version
   kube_proxy_version = var.kube_proxy_version
-  vpc_cni_version = var.vpc_cni_version
+  vpc_cni_version    = var.vpc_cni_version
+
+  enable_network_policy = var.enable_network_policy
 }
 
 # The in-cluster Helm releases depend on module.vpc so that destroy removes them
 # while the NAT gateway still exists: their uninstall hooks pull images.
 module "autoscaler" {
   depends_on = [module.eks, module.vpc]
-  source = "./autoscaler"
+  source     = "./autoscaler"
 
   cluster_name            = var.cluster_name
   managed_node_group_name = module.eks.managed_node_group_name
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
   oidc_provider_arn       = module.eks.oidc_provider_arn
   helm_chart_version      = var.cluster_autoscaler_chart_version
+  image_tag               = var.cluster_autoscaler_image_tag
   region                  = var.region
 }
 
 module "efs" {
   depends_on = [module.eks, module.vpc]
-  source = "./efs"
+  source     = "./efs"
 
   count = var.create_efs_storage ? 1 : 0
 
-  region       = var.region
-  vpc_id       = local.vpc_id
-  cluster_name = var.cluster_name
-  subnets      = module.vpc.private_subnet_ids
+  region                     = var.region
+  vpc_id                     = local.vpc_id
+  cluster_name               = var.cluster_name
+  subnets                    = module.vpc.private_subnet_ids
   allowed_security_group_ids = [module.eks.node_security_group_id, module.eks.cluster_security_group_id]
 }
 
 module "efs_csi_driver" {
   depends_on = [module.eks, module.vpc]
-  source = "./csi-driver"
+  source     = "./csi-driver"
 
   count = var.create_efs_storage ? 1 : 0
 
@@ -89,13 +92,6 @@ module "efs_csi_driver" {
 
   cluster_name      = var.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
-}
-
-module "calico" {
-  depends_on = [module.eks, module.vpc]
-  source = "./calico"
-
-  count = var.enable_calico ? 1 : 0
 }
 
 moved {

@@ -59,7 +59,7 @@ module "eks" {
 
   cluster_addons = {
     coredns = {
-      preserve = true
+      preserve      = true
       addon_version = var.coredns_version
 
       timeouts = {
@@ -70,8 +70,9 @@ module "eks" {
     kube-proxy = {
       addon_version = var.kube_proxy_version
     }
-    vpc-cni    = {
-      addon_version = var.vpc_cni_version
+    vpc-cni = {
+      addon_version        = var.vpc_cni_version
+      configuration_values = var.enable_network_policy ? jsonencode({ enableNetworkPolicy = "true" }) : null
     }
   }
 

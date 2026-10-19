@@ -29,7 +29,7 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  description = "EKS Kubernetes version. Keep cluster_autoscaler_chart_version on a chart built for the same minor version"
+  description = "EKS Kubernetes version. Keep the cluster-autoscaler on the same minor version, see cluster_autoscaler_chart_version and cluster_autoscaler_image_tag"
   type        = string
   default     = "1.35"
 }
@@ -38,6 +38,12 @@ variable "cluster_autoscaler_chart_version" {
   description = "cluster-autoscaler Helm chart version. Its cluster-autoscaler minor version must match the kubernetes_version minor version. The default 9.59.0 ships cluster-autoscaler 1.35. For other versions run: helm search repo autoscaler/cluster-autoscaler --versions"
   type        = string
   default     = "9.59.0"
+}
+
+variable "cluster_autoscaler_image_tag" {
+  description = "cluster-autoscaler image tag. Set it when no chart ships cluster-autoscaler for kubernetes_version yet, for example v1.36.1 for Kubernetes 1.36. null uses the chart's image"
+  type        = string
+  default     = null
 }
 
 variable "cluster_access_entries" {
@@ -54,7 +60,7 @@ variable "min_capacity" {
 
 variable "max_capacity" {
   description = "Max number of workers"
-  default = 20
+  default     = 20
 }
 
 variable "instance_types" {
@@ -86,21 +92,10 @@ variable "reclaim_policy" {
   default = "Retain"
 }
 
-variable "enable_calico" {
-  description = "Enable Calico for network policy enforcement"
-  default     = false
+variable "enable_network_policy" {
+  description = "Enforce Kubernetes NetworkPolicies with the Amazon VPC CNI (vpc-cni add-on v1.21.0 or later)"
   type        = bool
-}
-
-variable "calico_docker_hub_credentials" {
-  description = "Deprecated and ignored. Calico v3.30 and later pull their images from quay.io, so it needs no Docker Hub credentials"
-  type = object({
-    username = string
-    password = string
-    email    = string
-  })
-  default = null
-  sensitive = true
+  default     = false
 }
 
 variable "coredns_version" {

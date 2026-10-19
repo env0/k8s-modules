@@ -18,7 +18,7 @@ variable "min_capacity" {
 
 variable "max_capacity" {
   description = "Max number of workers"
-  default = 20
+  default     = 20
 }
 
 variable "instance_types" {
@@ -47,4 +47,10 @@ variable "kube_proxy_version" {
 
 variable "vpc_cni_version" {
   default = null
+}
+
+variable "enable_network_policy" {
+  description = "Enforce Kubernetes NetworkPolicies with the Amazon VPC CNI"
+  type        = bool
+  default     = false
 }
