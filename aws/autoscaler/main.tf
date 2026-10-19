@@ -19,13 +19,8 @@ module "eks-cluster-autoscaler" {
   # make sure that chart version matches the cluster version
   helm_chart_version = var.helm_chart_version
 
-  values = yamlencode({
-    # Here you we can further configure the autoscaler:
-    # https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml
-    # extraArgs: {
-    #  scale-down-utilization-threshold: local.single_deployment_pod_utilization_of_node_resources
-    #}
-  })
+  # https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml
+  values = var.image_tag == null ? yamlencode({}) : yamlencode({ image = { tag = var.image_tag } })
 }
 
 # https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws#common-notes-and-gotchas
