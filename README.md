@@ -5,8 +5,8 @@ Use them as-is, pick single submodules, or fork the repository and adjust them.
 
 | Folder | What it creates |
 |---|---|
-| [`aws`](aws) | A full EKS stack: VPC, EKS cluster, cluster autoscaler, and optional EFS storage and Calico |
-| [`aws/<submodule>`](aws) | One part of the AWS stack: `vpc`, `eks`, `autoscaler`, `efs`, `csi-driver`, `calico` |
+| [`aws`](aws) | A full EKS stack: VPC, EKS cluster, cluster autoscaler, optional EFS storage and optional network policy enforcement |
+| [`aws/<submodule>`](aws) | One part of the AWS stack: `vpc`, `eks`, `autoscaler`, `efs`, `csi-driver` |
 | [`gcp`](gcp) | NFS storage prerequisites for the agent on an existing GKE cluster |
 | [`log-storage/aws/dynamodb`](log-storage/aws/dynamodb) | DynamoDB tables for [hosting the deployment logs](https://docs.envzero.com/guides/admin-guide/self-hosted-kubernetes-agent/hosting-the-deployment-logs) in your AWS account |
 
@@ -26,7 +26,6 @@ The agent stores the deployment state and working directory with [env zero-hoste
 - Terraform >= 1.3.2 or OpenTofu.
 - AWS credentials that can create a VPC, EKS, IAM roles and Auto Scaling settings.
 - AWS CLI v2 and `bash` on the machine that runs Terraform. The providers use `aws eks get-token`, and the `autoscaler` submodule runs `aws autoscaling` commands.
-- `kubectl`, only with `enable_calico = true`. The `calico` submodule applies the Calico CRDs with it.
 - An env zero organization API key, set in `ENV0_API_KEY` and `ENV0_API_SECRET`. See [API keys](https://docs.envzero.com/guides/admin-guide/user-role-and-team-management/api-keys).
 
 ### Example
@@ -171,8 +170,7 @@ The module then creates an EFS file system, the EFS CSI driver, and the `env0-st
 | `coredns_version` / `kube_proxy_version` / `vpc_cni_version` | `null` | EKS addon versions. `null` uses the EKS default for `kubernetes_version` |
 | `azs` | `[]` | Availability zones for the subnets. Empty uses up to 3 available zones that EKS supports |
 | `cidr`, `private_subnets_cidr_blocks`, `public_subnets_cidr_blocks` | see [`aws/variables.tf`](aws/variables.tf) | VPC layout |
-| `enable_calico` | `false` | Install Calico (tigera-operator chart `v3.33.0`) for network policy enforcement. Calico v3.33 is tested on Kubernetes 1.35 to 1.37 |
-| `calico_docker_hub_credentials` | `null` | Deprecated and ignored. Calico v3.30 and later pull their images from quay.io |
+| `enable_network_policy` | `false` | Enforce Kubernetes `NetworkPolicy` objects with the Amazon VPC CNI. Needs vpc-cni v1.21.0 or later, the EKS default from Kubernetes 1.35 |
 
 ### Outputs
 
@@ -237,12 +235,35 @@ Node replacement evicts the pods on the old nodes. A deployment pod that is runn
 
 ### Upgrade from v1.2.0
 
-- Calico moved from `v3.31.7` to `v3.33.0`, which is tested on Kubernetes 1.35 to 1.37. Upgrade the cluster to 1.35 before you take this release.
-- Calico v3.33 upgrades only from v3.31 or v3.32. Coming from v1.1.0 (Calico 3.27.3), apply v1.2.0 first.
-- From v3.32 the tigera-operator chart no longer ships the Calico CRDs. The `calico` submodule now applies them with `kubectl apply --server-side` before it installs or upgrades the chart, so no manual CRD step is needed. This needs `kubectl` where Terraform runs.
-- The module now turns off Calico's goldmane and whisker (flow logs and the flow log UI). From v3.33 they need the `projectcalico.org/v3` API, which the module does not serve because it disables the Calico API server. The upgrade removes their pods. `kubectl get tigerastatus` shows `tiers` as degraded with "Waiting for Tigera API server to be ready" for the same reason. Network policy enforcement is not affected.
-- The `calico` submodule now requires `cluster_name`, and takes an optional `region`. The `aws` module passes both.
+- The module no longer installs Calico. The Amazon VPC CNI enforces network policies instead: set `enable_network_policy = true`. See [Move from Calico to VPC CNI network policies](#move-from-calico-to-vpc-cni-network-policies).
+- `enable_calico`, `calico_docker_hub_credentials` and the `aws/calico` submodule are removed. Terraform fails with "Unsupported argument" until you remove them from your configuration.
 - New optional input `cluster_autoscaler_image_tag`, for Kubernetes 1.36. See [Kubernetes and autoscaler versions](#kubernetes-and-autoscaler-versions).
+
+#### Move from Calico to VPC CNI network policies
+
+If you had `enable_calico = true`:
+
+1. Check for Calico-only resources. The VPC CNI enforces only Kubernetes `NetworkPolicy` objects, so Calico policies and network sets stop working:
+
+   ```bash
+   kubectl get networkpolicies.crd.projectcalico.org,globalnetworkpolicies.crd.projectcalico.org,globalnetworksets.crd.projectcalico.org,networksets.crd.projectcalico.org -A
+   ```
+
+2. In one apply, remove `enable_calico` and set `enable_network_policy = true`. The plan updates the `vpc-cni` add-on and destroys `module.calico[0].helm_release.calico`, which uninstalls Calico. Your `NetworkPolicy` objects stay, and the VPC CNI enforces them.
+3. Replace every node. Calico can leave its iptables rules behind on the nodes it ran on, and [AWS recommends replacing them](https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html). Drain one node at a time, then terminate its instance without lowering the desired capacity, so the node group launches a replacement:
+
+   ```bash
+   kubectl drain <node> --ignore-daemonsets --delete-emptydir-data
+   aws autoscaling terminate-instance-in-auto-scaling-group --instance-id <instance-id> --no-should-decrement-desired-capacity
+   ```
+
+4. Optionally, delete the Calico CRDs:
+
+   ```bash
+   kubectl get crd -o name | grep -E 'projectcalico.org|operator.tigera.io' | xargs kubectl delete
+   ```
+
+The VPC CNI has its own limits, such as a Service port having to match the container port. See the [AWS considerations](https://docs.aws.amazon.com/eks/latest/userguide/cni-network-policy.html#cni-network-policy-considerations).
 
 ### Upgrade from v1.1.0
 

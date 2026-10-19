@@ -49,6 +49,8 @@ module "eks" {
   coredns_version    = var.coredns_version
   kube_proxy_version = var.kube_proxy_version
   vpc_cni_version    = var.vpc_cni_version
+
+  enable_network_policy = var.enable_network_policy
 }
 
 # The in-cluster Helm releases depend on module.vpc so that destroy removes them
@@ -90,16 +92,6 @@ module "efs_csi_driver" {
 
   cluster_name      = var.cluster_name
   oidc_provider_arn = module.eks.oidc_provider_arn
-}
-
-module "calico" {
-  depends_on = [module.eks, module.vpc]
-  source     = "./calico"
-
-  count = var.enable_calico ? 1 : 0
-
-  cluster_name = var.cluster_name
-  region       = var.region
 }
 
 moved {
