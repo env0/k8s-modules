@@ -1,0 +1,35 @@
+// https://docs.renovatebot.com/configuration-options/
+{
+  extends: [
+    "config:recommended",
+    ":automergeMinor",
+    "helpers:pinGitHubActionDigests",
+  ],
+  minimumReleaseAge: "3 days",
+  timezone: "Asia/Jerusalem",
+  schedule: ["before 6am on sunday"],
+  rebaseWhen: "conflicted",
+  prCreation: "immediate",
+  // No rangeStrategy "pin" as in env0/env0: these are reusable modules, so provider and module
+  // constraints stay ranges that callers can resolve against their own versions.
+  prHourlyLimit: 5,
+  labels: ["renovate 🎨"],
+  vulnerabilityAlerts: {
+    schedule: ["at any time"],
+    minimumReleaseAge: null,
+    groupName: null,
+    labels: ["renovate 🎨", "security"],
+  },
+  osvVulnerabilityAlerts: true,
+  packageRules: [
+    {
+      matchManagers: ["github-actions"],
+      groupName: "GitHub Actions",
+    },
+    {
+      matchManagers: ["terraform"],
+      matchUpdateTypes: ["minor", "patch", "pin", "digest"],
+      groupName: "non-major",
+    },
+  ],
+}
