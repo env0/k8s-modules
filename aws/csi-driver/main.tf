@@ -31,7 +31,7 @@ resource "helm_release" "kubernetes_efs_csi_driver" {
   name       = "aws-efs-csi-driver"
   repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
   chart      = "aws-efs-csi-driver"
-  version    = "3.4.1"
+  version    = "4.5.4"
 
   namespace = local.namespace
   timeout   = 600
